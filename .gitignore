@@ -1,0 +1,22 @@
+
+# .NET
+bin/
+obj/
+.vs/
+*.user
+*.suo
+
+# Node.js
+node_modules/
+dist/
+
+# Ambiente e segredos
+.env
+.env.*
+!.env.example
+
+# IDE
+.idea/
+
+# Logs
+*.log
