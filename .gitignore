@@ -1,0 +1,32 @@
+# .NET
+[Bb]in/
+[Oo]bj/
+[Ll]ogs/
+*.user
+*.suo
+*.cache
+
+# Visual Studio / VS Code
+.vs/
+.vscode/
+
+# Node / React / Vite
+node_modules/
+dist/
+coverage/
+.npm/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Operating system
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Temporary files
+*.tmp
+*.log
+*.swp
