@@ -5,6 +5,42 @@ namespace RetroGames.WebApi.Mappers;
 
 public static class JogoMapper
 {
+    public static RetroGames.Model.Model.Jogo ParaModel(this InserirJogoRequestApiModel request)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+
+        return new RetroGames.Model.Model.Jogo
+        {
+            Nome = request.Nome,
+            Descricao = NormalizarDescricao(request.Descricao),
+            AnoLancamento = request.AnoLancamento,
+            Preco = request.Preco,
+            Estoque = request.Estoque,
+            Ativo = true,
+            DataCadastro = DateTime.Now,
+            IdPlataforma = request.IdPlataforma,
+            IdCondicaoJogo = request.IdCondicaoJogo,
+        };
+    }
+
+    public static RetroGames.Model.Model.Jogo ParaModel(this AlterarJogoRequestApiModel request, int id)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+
+        return new RetroGames.Model.Model.Jogo
+        {
+            Id = id,
+            Nome = request.Nome,
+            Descricao = NormalizarDescricao(request.Descricao),
+            AnoLancamento = request.AnoLancamento,
+            Preco = request.Preco,
+            Estoque = request.Estoque,
+            Ativo = request.Ativo,
+            IdPlataforma = request.IdPlataforma,
+            IdCondicaoJogo = request.IdCondicaoJogo,
+        };
+    }
+
     public static (string? Busca, int? IdPlataforma, int? IdGenero, int Pagina, int TamanhoPagina) ParaFiltro(
         this ListarJogoRequestApiModel request)
     {
@@ -53,5 +89,10 @@ public static class JogoMapper
                 Nome = genero.Nome,
             }).ToList(),
         };
+    }
+
+    private static string? NormalizarDescricao(string? descricao)
+    {
+        return string.IsNullOrWhiteSpace(descricao) ? null : descricao;
     }
 }

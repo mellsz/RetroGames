@@ -75,10 +75,11 @@ public sealed class JogoService : IJogoService
     public async Task AlterarAsync(Jogo jogo, IReadOnlyCollection<int> idsGeneros)
     {
         ArgumentNullException.ThrowIfNull(jogo);
-        await GarantirJogoExisteAsync(jogo.Id);
+        var jogoExistente = await BuscarJogoExistenteAsync(jogo.Id);
         var generos = await ValidarReferenciasAsync(jogo, idsGeneros);
 
         jogo.Nome = jogo.Nome.Trim();
+        jogo.DataCadastro = jogoExistente.DataCadastro;
 
         using var transactionScope = CriarTransactionScope();
         await _repositorio.Jogo.AlterarAsync(jogo);
@@ -97,7 +98,7 @@ public sealed class JogoService : IJogoService
 
     public async Task DesativarAsync(int id)
     {
-        await GarantirJogoExisteAsync(id);
+        await BuscarJogoExistenteAsync(id);
         await _repositorio.Jogo.DesativarAsync(id);
     }
 
@@ -130,12 +131,10 @@ public sealed class JogoService : IJogoService
                 }).ToList();
     }
 
-    private async Task GarantirJogoExisteAsync(int id)
+    private async Task<Jogo> BuscarJogoExistenteAsync(int id)
     {
-        if (await _repositorio.Jogo.BuscarPorIdAsync(id) is null)
-        {
-            throw new BusinessRuleException(BusinessErrors.JOGO_NAO_ENCONTRADO);
-        }
+        return await _repositorio.Jogo.BuscarPorIdAsync(id)
+            ?? throw new BusinessRuleException(BusinessErrors.JOGO_NAO_ENCONTRADO);
     }
 
     private async Task<int[]> ValidarReferenciasAsync(Jogo jogo, IReadOnlyCollection<int> idsGeneros)
