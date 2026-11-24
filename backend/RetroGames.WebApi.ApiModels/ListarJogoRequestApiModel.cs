@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace RetroGames.WebApi.ApiModels;
 
 public class ListarJogoRequestApiModel
@@ -10,9 +8,7 @@ public class ListarJogoRequestApiModel
 
     public int? IdGenero { get; set; }
 
-    [Range(1, int.MaxValue, ErrorMessage = "A página deve ser maior ou igual a 1.")]
     public int Pagina { get; set; } = 1;
 
-    [Range(1, int.MaxValue, ErrorMessage = "O tamanho da página deve ser maior ou igual a 1.")]
     public int TamanhoPagina { get; set; } = 12;
 }
