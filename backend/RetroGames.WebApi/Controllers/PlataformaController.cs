@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RetroGames.Services;
 using RetroGames.WebApi.ApiModels;
+using RetroGames.WebApi.Configuration;
 using RetroGames.WebApi.Mappers;
 
 namespace RetroGames.WebApi.Controllers;
@@ -17,6 +19,7 @@ public sealed class PlataformaController : ControllerBase
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<ActionResult<RetroGamesResponseApiModel<List<ListarPlataformaResponseApiModel>>>> Listar()
     {
         var plataformas = await _service.ListarAsync();
@@ -29,6 +32,7 @@ public sealed class PlataformaController : ControllerBase
     }
 
     [HttpGet("{id:int}")]
+    [AllowAnonymous]
     public async Task<ActionResult<RetroGamesResponseApiModel<ListarPlataformaResponseApiModel>>> ListarPorId(int id)
     {
         var plataforma = await _service.BuscarPorIdAsync(id);
@@ -37,6 +41,49 @@ public sealed class PlataformaController : ControllerBase
         {
             ResponseCode = ResponseCodes.SUCESSO,
             Data = plataforma.ParaResponse(),
+        });
+    }
+
+    [HttpPost]
+    [Authorize(Policy = Politicas.Administrador)]
+    public async Task<ActionResult<RetroGamesResponseApiModel<ListarPlataformaResponseApiModel>>> Inserir(
+        [FromBody] InserirPlataformaRequestApiModel? request)
+    {
+        var plataforma = await _service.InserirAsync(request!.ParaModel());
+        var resposta = new RetroGamesResponseApiModel<ListarPlataformaResponseApiModel>
+        {
+            ResponseCode = ResponseCodes.SUCESSO,
+            Data = plataforma.ParaResponse(),
+        };
+
+        return CreatedAtAction(nameof(ListarPorId), new { id = plataforma.Id }, resposta);
+    }
+
+    [HttpPut("{id:int}")]
+    [Authorize(Policy = Politicas.Administrador)]
+    public async Task<ActionResult<RetroGamesResponseApiModel<ListarPlataformaResponseApiModel>>> Alterar(
+        int id,
+        [FromBody] AlterarPlataformaRequestApiModel? request)
+    {
+        var plataforma = request!.ParaModel(id);
+        await _service.AlterarAsync(plataforma);
+
+        return Ok(new RetroGamesResponseApiModel<ListarPlataformaResponseApiModel>
+        {
+            ResponseCode = ResponseCodes.SUCESSO,
+            Data = plataforma.ParaResponse(),
+        });
+    }
+
+    [HttpDelete("{id:int}")]
+    [Authorize(Policy = Politicas.Administrador)]
+    public async Task<ActionResult<RetroGamesResponseApiModel>> Excluir(int id)
+    {
+        await _service.ExcluirAsync(id);
+
+        return Ok(new RetroGamesResponseApiModel
+        {
+            ResponseCode = ResponseCodes.SUCESSO,
         });
     }
 }

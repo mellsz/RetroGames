@@ -7,16 +7,19 @@ namespace RetroGames.Services;
 public sealed class JogoService : IJogoService
 {
     private readonly IRepositorySet _repositorio;
+    private readonly IUsuarioAtualService _usuarioAtual;
 
-    public JogoService(IRepositorySet repositorio)
+    public JogoService(IRepositorySet repositorio, IUsuarioAtualService usuarioAtual)
     {
         _repositorio = repositorio ?? throw new ArgumentNullException(nameof(repositorio));
+        _usuarioAtual = usuarioAtual ?? throw new ArgumentNullException(nameof(usuarioAtual));
     }
 
     public async Task<(List<JogoDetalheServiceModel> Jogos, int TotalEncontrado)> ListarAsync(
         string? busca = null,
         int? idPlataforma = null,
         int? idGenero = null,
+        bool incluirInativos = false,
         int pagina = 1,
         int tamanhoPagina = 10)
     {
@@ -34,7 +37,7 @@ public sealed class JogoService : IJogoService
             busca,
             idPlataforma,
             idsJogos,
-            incluirInativos: false,
+            incluirInativos: incluirInativos && _usuarioAtual.EhAdministrador,
             pagina,
             tamanhoPagina);
 
@@ -45,6 +48,11 @@ public sealed class JogoService : IJogoService
     {
         var jogo = await _repositorio.Jogo.BuscarPorIdAsync(id)
             ?? throw new BusinessRuleException(BusinessErrors.JOGO_NAO_ENCONTRADO);
+
+        if (!jogo.Ativo && !_usuarioAtual.EhAdministrador)
+        {
+            throw new BusinessRuleException(BusinessErrors.JOGO_NAO_ENCONTRADO);
+        }
 
         return (await MontarDetalhesAsync([jogo])).Single();
     }
@@ -75,10 +83,11 @@ public sealed class JogoService : IJogoService
     public async Task AlterarAsync(Jogo jogo, IReadOnlyCollection<int> idsGeneros)
     {
         ArgumentNullException.ThrowIfNull(jogo);
-        await GarantirJogoExisteAsync(jogo.Id);
+        var jogoExistente = await BuscarJogoExistenteAsync(jogo.Id);
         var generos = await ValidarReferenciasAsync(jogo, idsGeneros);
 
         jogo.Nome = jogo.Nome.Trim();
+        jogo.DataCadastro = jogoExistente.DataCadastro;
 
         using var transactionScope = CriarTransactionScope();
         await _repositorio.Jogo.AlterarAsync(jogo);
@@ -97,7 +106,7 @@ public sealed class JogoService : IJogoService
 
     public async Task DesativarAsync(int id)
     {
-        await GarantirJogoExisteAsync(id);
+        await BuscarJogoExistenteAsync(id);
         await _repositorio.Jogo.DesativarAsync(id);
     }
 
@@ -130,12 +139,10 @@ public sealed class JogoService : IJogoService
                 }).ToList();
     }
 
-    private async Task GarantirJogoExisteAsync(int id)
+    private async Task<Jogo> BuscarJogoExistenteAsync(int id)
     {
-        if (await _repositorio.Jogo.BuscarPorIdAsync(id) is null)
-        {
-            throw new BusinessRuleException(BusinessErrors.JOGO_NAO_ENCONTRADO);
-        }
+        return await _repositorio.Jogo.BuscarPorIdAsync(id)
+            ?? throw new BusinessRuleException(BusinessErrors.JOGO_NAO_ENCONTRADO);
     }
 
     private async Task<int[]> ValidarReferenciasAsync(Jogo jogo, IReadOnlyCollection<int> idsGeneros)

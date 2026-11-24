@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RetroGames.Services;
 using RetroGames.WebApi.ApiModels;
+using RetroGames.WebApi.Configuration;
 using RetroGames.WebApi.Mappers;
 
 namespace RetroGames.WebApi.Controllers;
@@ -17,6 +19,7 @@ public sealed class JogoController : ControllerBase
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<ActionResult<RetroGamesResponseApiModel<PaginaResponseApiModel<ListarJogoResponseApiModel>>>> Listar(
         [FromQuery] ListarJogoRequestApiModel request)
     {
@@ -25,6 +28,7 @@ public sealed class JogoController : ControllerBase
             filtro.Busca,
             filtro.IdPlataforma,
             filtro.IdGenero,
+            filtro.IncluirInativos,
             filtro.Pagina,
             filtro.TamanhoPagina);
 
@@ -44,6 +48,7 @@ public sealed class JogoController : ControllerBase
     }
 
     [HttpGet("{id:int}")]
+    [AllowAnonymous]
     public async Task<ActionResult<RetroGamesResponseApiModel<ListarPorIdJogoResponseApiModel>>> ListarPorId(int id)
     {
         var jogo = await _service.BuscarPorIdAsync(id);
@@ -52,6 +57,52 @@ public sealed class JogoController : ControllerBase
         {
             ResponseCode = ResponseCodes.SUCESSO,
             Data = jogo.ParaListarPorIdResponse(),
+        });
+    }
+
+    [HttpPost]
+    [Authorize(Policy = Politicas.Administrador)]
+    public async Task<ActionResult<RetroGamesResponseApiModel<ListarPorIdJogoResponseApiModel>>> Inserir(
+        [FromBody] InserirJogoRequestApiModel? request)
+    {
+        var requestRecebido = request!;
+        var jogo = await _service.InserirAsync(requestRecebido.ParaModel(), requestRecebido.IdsGeneros);
+        var detalhe = await _service.BuscarPorIdAsync(jogo.Id);
+        var resposta = new RetroGamesResponseApiModel<ListarPorIdJogoResponseApiModel>
+        {
+            ResponseCode = ResponseCodes.SUCESSO,
+            Data = detalhe.ParaListarPorIdResponse(),
+        };
+
+        return CreatedAtAction(nameof(ListarPorId), new { id = jogo.Id }, resposta);
+    }
+
+    [HttpPut("{id:int}")]
+    [Authorize(Policy = Politicas.Administrador)]
+    public async Task<ActionResult<RetroGamesResponseApiModel<ListarPorIdJogoResponseApiModel>>> Alterar(
+        int id,
+        [FromBody] AlterarJogoRequestApiModel? request)
+    {
+        var requestRecebido = request!;
+        await _service.AlterarAsync(requestRecebido.ParaModel(id), requestRecebido.IdsGeneros);
+        var detalhe = await _service.BuscarPorIdAsync(id);
+
+        return Ok(new RetroGamesResponseApiModel<ListarPorIdJogoResponseApiModel>
+        {
+            ResponseCode = ResponseCodes.SUCESSO,
+            Data = detalhe.ParaListarPorIdResponse(),
+        });
+    }
+
+    [HttpDelete("{id:int}")]
+    [Authorize(Policy = Politicas.Administrador)]
+    public async Task<ActionResult<RetroGamesResponseApiModel>> Desativar(int id)
+    {
+        await _service.DesativarAsync(id);
+
+        return Ok(new RetroGamesResponseApiModel
+        {
+            ResponseCode = ResponseCodes.SUCESSO,
         });
     }
 }
