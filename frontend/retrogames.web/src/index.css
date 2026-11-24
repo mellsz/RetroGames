@@ -1,3 +1,90 @@
+:root {
+  /* Base — backgrounds */
+  --rg-bg-deep: #04020f;
+  --rg-bg-dark: #0d0820;
+  --rg-bg-surface: #160d35;
+  --rg-bg-raised: #1e1248;
+
+  /* Cores principais — roxo/violeta */
+  --rg-purple-dim: #3b1f8c;
+  --rg-purple: #6d28d9;
+  --rg-purple-bright: #8b5cf6;
+  --rg-violet: #a78bfa;
+
+  /* Cores complementares */
+  --rg-magenta: #d946ef;
+  --rg-cyan: #22d3ee;
+
+  /* Destaques — chamadas de ação */
+  --rg-yellow: #fbbf24;
+  --rg-orange: #f97316;
+
+  /* Texto */
+  --rg-text-primary: #f1f0ff;
+  --rg-text-secondary: #a89bc2;
+  --rg-text-muted: #726496;
+
+  /* Estados */
+  --rg-error: #f87171;
+  --rg-success: #34d399;
+
+  /* Tipografia */
+  --rg-font-display: 'Press Start 2P', monospace;
+  --rg-font-body: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* Raios e bordas */
+  --rg-radius-sm: 4px;
+  --rg-radius-md: 8px;
+  --rg-radius-lg: 12px;
+  --rg-radius-pill: 999px;
+
+  --rg-border-subtle: 1px solid var(--rg-purple-dim);
+  --rg-border-active: 1px solid var(--rg-purple-bright);
+
+  /* Sombras / Glows contidos */
+  --rg-glow-purple: 0 0 14px rgba(109, 40, 217, 0.45);
+  --rg-glow-cyan: 0 0 10px rgba(34, 211, 238, 0.3);
+  --rg-glow-yellow: 0 0 12px rgba(251, 191, 36, 0.35);
+
+  /* Ajustes globais Bootstrap */
+  --bs-body-bg: var(--rg-bg-dark);
+  --bs-body-color: var(--rg-text-primary);
+  --bs-border-color: var(--rg-purple-dim);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
+  background-color: var(--rg-bg-dark);
+  color: var(--rg-text-primary);
+  font-family: var(--rg-font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--rg-cyan);
+}
+
+a:hover {
+  color: var(--rg-yellow);
+}
+
+:focus-visible {
+  outline: 2px solid var(--rg-cyan);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
