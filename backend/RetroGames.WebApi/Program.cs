@@ -1,22 +1,34 @@
+using DotNetEnv;
+using RetroGames.WebApi.Configuration;
+using RetroGames.WebApi.Middlewares;
+
+Env.TraversePath().Load();
+
+var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__Default")
+    ?? throw new InvalidOperationException(
+        "A configuração ConnectionStrings__Default não foi encontrada no arquivo .env.");
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
+builder.Services.AddRepositorios(connectionString);
+builder.Services.AddServicosDeNegocio();
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+app.UseExceptionHandler();
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/openapi/v1.json", "RetroGames API v1");
+    });
 }
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
 
 app.MapControllers();
 
