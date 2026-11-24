@@ -22,6 +22,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRepositorios(connectionString);
 builder.Services.AddServicosDeNegocio();
+builder.Services.AddAutenticacao();
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.AddControllers(options => options.Filters.Add<FluentValidationFilter>());
 builder.Services.Configure<ApiBehaviorOptions>(options =>
@@ -42,6 +43,8 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.UseExceptionHandler();
+app.UseAuthentication();
+app.UseAuthorization();
 
 if (app.Environment.IsDevelopment())
 {
