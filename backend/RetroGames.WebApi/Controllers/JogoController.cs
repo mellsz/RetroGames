@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RetroGames.Services;
 using RetroGames.WebApi.ApiModels;
+using RetroGames.WebApi.Configuration;
 using RetroGames.WebApi.Mappers;
 
 namespace RetroGames.WebApi.Controllers;
@@ -17,6 +19,7 @@ public sealed class JogoController : ControllerBase
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<ActionResult<RetroGamesResponseApiModel<PaginaResponseApiModel<ListarJogoResponseApiModel>>>> Listar(
         [FromQuery] ListarJogoRequestApiModel request)
     {
@@ -25,6 +28,7 @@ public sealed class JogoController : ControllerBase
             filtro.Busca,
             filtro.IdPlataforma,
             filtro.IdGenero,
+            filtro.IncluirInativos,
             filtro.Pagina,
             filtro.TamanhoPagina);
 
@@ -44,6 +48,7 @@ public sealed class JogoController : ControllerBase
     }
 
     [HttpGet("{id:int}")]
+    [AllowAnonymous]
     public async Task<ActionResult<RetroGamesResponseApiModel<ListarPorIdJogoResponseApiModel>>> ListarPorId(int id)
     {
         var jogo = await _service.BuscarPorIdAsync(id);
@@ -56,6 +61,7 @@ public sealed class JogoController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = Politicas.Administrador)]
     public async Task<ActionResult<RetroGamesResponseApiModel<ListarPorIdJogoResponseApiModel>>> Inserir(
         [FromBody] InserirJogoRequestApiModel? request)
     {
@@ -72,6 +78,7 @@ public sealed class JogoController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Policy = Politicas.Administrador)]
     public async Task<ActionResult<RetroGamesResponseApiModel<ListarPorIdJogoResponseApiModel>>> Alterar(
         int id,
         [FromBody] AlterarJogoRequestApiModel? request)
@@ -88,6 +95,7 @@ public sealed class JogoController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Policy = Politicas.Administrador)]
     public async Task<ActionResult<RetroGamesResponseApiModel>> Desativar(int id)
     {
         await _service.DesativarAsync(id);

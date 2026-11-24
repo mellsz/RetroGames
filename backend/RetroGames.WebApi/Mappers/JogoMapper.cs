@@ -41,11 +41,11 @@ public static class JogoMapper
         };
     }
 
-    public static (string? Busca, int? IdPlataforma, int? IdGenero, int Pagina, int TamanhoPagina) ParaFiltro(
+    public static (string? Busca, int? IdPlataforma, int? IdGenero, bool IncluirInativos, int Pagina, int TamanhoPagina) ParaFiltro(
         this ListarJogoRequestApiModel request)
     {
         ArgumentNullException.ThrowIfNull(request);
-        return (request.Busca, request.IdPlataforma, request.IdGenero, request.Pagina, request.TamanhoPagina);
+        return (request.Busca, request.IdPlataforma, request.IdGenero, request.IncluirInativos, request.Pagina, request.TamanhoPagina);
     }
 
     public static ListarJogoResponseApiModel ParaListarResponse(this JogoDetalheServiceModel detalhe)

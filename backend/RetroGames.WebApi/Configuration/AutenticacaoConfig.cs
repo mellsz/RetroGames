@@ -28,7 +28,6 @@ public static class AutenticacaoConfig
                     ResponseCodes.MENSAGEM_ACESSO_NEGADO);
             });
 
-        services.AddAuthorization();
         return services;
     }
 

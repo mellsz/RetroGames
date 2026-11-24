@@ -8,6 +8,7 @@ public interface IJogoService
         string? busca = null,
         int? idPlataforma = null,
         int? idGenero = null,
+        bool incluirInativos = false,
         int pagina = 1,
         int tamanhoPagina = 10);
 
