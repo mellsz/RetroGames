@@ -1,3 +1,5 @@
+import gatoEstadoVazio from '../assets/gato-estado-vazio.png'
+
 export function Carregando({ mensagem = 'Carregando jogos...' }) {
   return (
     <div className="rg-estado-box my-4" role="status" aria-live="polite">
@@ -52,22 +54,17 @@ export function MensagemErro({ mensagem, aoTentarNovamente }) {
 }
 
 export function EstadoVazio({
-  titulo = 'Nenhum jogo encontrado.',
-  descricao = 'Tente buscar outro título ou remover parte dos filtros.',
+  titulo = 'Ops! Nenhum jogo encontrado.',
+  descricao = 'Que tal explorar nosso catálogo novamente?',
   acao,
 }) {
   return (
-    <div className="rg-estado-box my-4">
-      <div className="mb-3" aria-hidden="true">
-        <svg width="56" height="40" viewBox="0 0 28 20" fill="none">
-          <rect x="4" y="4" width="20" height="14" rx="2" fill="#1e1248" stroke="#6d28d9" strokeWidth="2" />
-          <rect x="9" y="9" width="2" height="2" fill="#a78bfa" />
-          <rect x="17" y="9" width="2" height="2" fill="#a78bfa" />
-          <rect x="11" y="13" width="6" height="1.5" fill="#d946ef" />
-        </svg>
+    <div className="rg-estado-vazio my-4">
+      <div className="rg-gatinho-vazio" aria-hidden="true">
+        <img src={gatoEstadoVazio} alt="" />
       </div>
-      <h2 className="h5 mb-2">{titulo}</h2>
-      <p className="mb-3" style={{ color: 'var(--rg-text-secondary)' }}>
+      <h2 className="rg-vazio-titulo">{titulo}</h2>
+      <p className="rg-vazio-descricao">
         {descricao}
       </p>
       {acao}

@@ -1,12 +1,50 @@
 import { Link } from 'react-router-dom'
 import { formatarPreco } from '../lib/formato'
 
+const capasJogos = import.meta.glob('../assets/jogos/*', {
+  eager: true,
+  query: '?url',
+  import: 'default',
+})
+
+function normalizarNome(valor) {
+  return valor
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '')
+}
+
+function obterCapa(nomeJogo) {
+  const nomeNormalizado = normalizarNome(nomeJogo)
+  const nomeArquivosEspecificos = {
+    [normalizarNome('Phantasy Star IV')]: 'Phantasy_Star_EotM_cover_MegaDrive.jpg',
+    [normalizarNome('Sonic the Hedgehog 2')]: 'Sonic_Megadrive.jpg',
+    [normalizarNome('The Legend of Zelda Ocarina of Time')]: 'The_Legend_of_Zelda_nintendo64.jpg',
+  }
+  const arquivoEspecifico = Object.entries(nomeArquivosEspecificos)
+    .find(([nomeBase]) => nomeNormalizado.includes(nomeBase))?.[1]
+  if (arquivoEspecifico) {
+    const encontrado = Object.entries(capasJogos).find(([caminho]) => caminho.endsWith(arquivoEspecifico))
+    if (encontrado) return encontrado[1]
+  }
+
+  const entrada = Object.entries(capasJogos).find(([caminho]) =>
+    nomeNormalizado.includes(normalizarNome(caminho.split('/').pop().replace(/\.[^.]+$/, '')))
+      || normalizarNome(caminho.split('/').pop()).includes(nomeNormalizado),
+  )
+
+  return entrada?.[1]
+}
+
 export function CardJogo({ jogo }) {
   const esgotado = jogo.estoque <= 0
+  const capa = obterCapa(jogo.nome)
 
   return (
     <article className={`rg-card-jogo ${esgotado ? 'rg-card-jogo--esgotado' : ''}`}>
       <div className="rg-card-capa">
+        {capa && <img className="rg-card-capa-imagem" src={capa} alt={`Capa de ${jogo.nome}`} loading="lazy" />}
         <div className="d-flex align-items-start justify-content-between gap-2">
           <span className="rg-badge-plataforma">{jogo.nomePlataforma}</span>
           {esgotado ? (

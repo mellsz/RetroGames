@@ -5,7 +5,10 @@ import { IntroArcade } from './components/IntroArcade'
 import { Layout } from './components/Layout'
 import { Catalogo } from './pages/Catalogo/Catalogo'
 import { DetalheJogo } from './pages/Catalogo/DetalheJogo'
+import { Contato } from './pages/Contato'
+import { Inicio } from './pages/Inicio'
 import { NaoEncontrada } from './pages/NaoEncontrada'
+import { Sobre } from './pages/Sobre'
 
 function App() {
   const location = useLocation()
@@ -31,9 +34,12 @@ function App() {
       <Routes>
         <Route element={<Layout aoAbrirIntro={abrirIntro} />}>
           <Route path="/" element={<Catalogo />} />
+          <Route path="/inicio" element={<Inicio aoAbrirIntro={abrirIntro} />} />
+          <Route path="/sobre" element={<Sobre />} />
+          <Route path="/contato" element={<Contato />} />
           <Route path="/jogos/:id" element={<DetalheJogo />} />
+          <Route path="*" element={<NaoEncontrada />} />
         </Route>
-        <Route path="*" element={<NaoEncontrada />} />
       </Routes>
     </>
   )
