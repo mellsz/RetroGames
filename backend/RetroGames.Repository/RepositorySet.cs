@@ -11,6 +11,7 @@ public sealed class RepositorySet : IRepositorySet
         JogoGenero = new JogoGeneroRepository(config);
         Genero = new GeneroRepository(config);
         CondicaoJogo = new CondicaoJogoRepository(config);
+        Usuario = new UsuarioRepository(config);
     }
 
     public IPlataformaRepository Plataforma { get; }
@@ -22,4 +23,6 @@ public sealed class RepositorySet : IRepositorySet
     public IGeneroRepository Genero { get; }
 
     public ICondicaoJogoRepository CondicaoJogo { get; }
+
+    public IUsuarioRepository Usuario { get; }
 }

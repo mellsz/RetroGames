@@ -11,6 +11,12 @@ Env.TraversePath().Load();
 var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__Default")
     ?? throw new InvalidOperationException(
         "A configuração ConnectionStrings__Default não foi encontrada no arquivo .env.");
+var adminInicialEmail = Environment.GetEnvironmentVariable("AdminInicial__Email")
+    ?? throw new InvalidOperationException(
+        "A configuração AdminInicial__Email não foi encontrada no arquivo .env.");
+var adminInicialSenha = Environment.GetEnvironmentVariable("AdminInicial__Senha")
+    ?? throw new InvalidOperationException(
+        "A configuração AdminInicial__Senha não foi encontrada no arquivo .env.");
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +34,12 @@ builder.Services.AddProblemDetails();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var autenticacaoService = scope.ServiceProvider.GetRequiredService<RetroGames.Services.IAutenticacaoService>();
+    await autenticacaoService.GarantirAdministradorInicialAsync(adminInicialEmail, adminInicialSenha);
+}
 
 app.UseExceptionHandler();
 
