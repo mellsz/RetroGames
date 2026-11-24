@@ -1,5 +1,7 @@
 using DotNetEnv;
+using Microsoft.AspNetCore.Mvc;
 using RetroGames.WebApi.Configuration;
+using RetroGames.WebApi.ApiModels;
 using RetroGames.WebApi.Middlewares;
 
 Env.TraversePath().Load();
@@ -12,7 +14,17 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRepositorios(connectionString);
 builder.Services.AddServicosDeNegocio();
-builder.Services.AddControllers();
+builder.Services
+    .AddControllers()
+    .ConfigureApiBehaviorOptions(options =>
+    {
+        options.InvalidModelStateResponseFactory = _ => new BadRequestObjectResult(
+            new RetroGamesResponseApiModel
+            {
+                ResponseCode = ResponseCodes.PARAMETROS_INVALIDOS,
+                ErrorMessage = "Os parâmetros informados são inválidos.",
+            });
+    });
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 builder.Services.AddOpenApi();
