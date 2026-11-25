@@ -1,9 +1,9 @@
 :root {
   /* Base — backgrounds */
-  --rg-bg-deep: #04020f;
-  --rg-bg-dark: #0d0820;
-  --rg-bg-surface: #160d35;
-  --rg-bg-raised: #1e1248;
+  --rg-bg-deep: #07080e;
+  --rg-bg-dark: #0a0b14;
+  --rg-bg-surface: #161821;
+  --rg-bg-raised: #20222c;
 
   /* Cores principais — roxo/violeta */
   --rg-purple-dim: #3b1f8c;
@@ -16,8 +16,8 @@
   --rg-cyan: #22d3ee;
 
   /* Destaques — chamadas de ação */
-  --rg-yellow: #fbbf24;
-  --rg-orange: #f97316;
+  --rg-yellow: #e8be68;
+  --rg-orange: #d88b4a;
 
   /* Texto */
   --rg-text-primary: #f1f0ff;
@@ -38,18 +38,18 @@
   --rg-radius-lg: 12px;
   --rg-radius-pill: 999px;
 
-  --rg-border-subtle: 1px solid var(--rg-purple-dim);
+  --rg-border-subtle: 1px solid rgba(255, 255, 255, 0.08);
   --rg-border-active: 1px solid var(--rg-purple-bright);
 
   /* Sombras / Glows contidos */
   --rg-glow-purple: 0 0 14px rgba(109, 40, 217, 0.45);
   --rg-glow-cyan: 0 0 10px rgba(34, 211, 238, 0.3);
-  --rg-glow-yellow: 0 0 12px rgba(251, 191, 36, 0.35);
+  --rg-glow-yellow: 0 0 10px rgba(232, 190, 104, 0.22);
 
   /* Ajustes globais Bootstrap */
   --bs-body-bg: var(--rg-bg-dark);
   --bs-body-color: var(--rg-text-primary);
-  --bs-border-color: var(--rg-purple-dim);
+  --bs-border-color: rgba(255, 255, 255, 0.08);
 }
 
 *,
