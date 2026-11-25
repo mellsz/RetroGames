@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { formatarPreco } from '../lib/formato'
+import { IconeCarrinho } from './IconesNavbar'
 
 const capasJogos = import.meta.glob('../assets/jogos/*', {
   eager: true,
@@ -81,7 +82,8 @@ export function CardJogo({ jogo }) {
 
         <div className="mt-auto pt-2 border-top d-flex align-items-center justify-content-between gap-2" style={{ borderColor: 'rgba(59, 31, 140, 0.55)' }}>
           <span className="rg-preco">{formatarPreco(jogo.preco)}</span>
-          <Link to={`/jogos/${jogo.id}`} className="btn btn-sm rg-btn-secondary">
+          <Link to={`/jogos/${jogo.id}`} className="btn btn-sm rg-btn-secondary rg-card-detalhes">
+            <IconeCarrinho />
             Ver detalhes
           </Link>
         </div>

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, NavLink, Outlet, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, NavLink, Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import logoRetroGames from '../assets/logo-retrogames.png'
 import { IconeCarrinho, IconeLupa, IconePessoa } from './IconesNavbar'
 
@@ -7,8 +7,10 @@ const ANO_ATUAL = new Date().getFullYear()
 
 export function Layout({ aoAbrirIntro }) {
   const navigate = useNavigate()
+  const localizacao = useLocation()
   const [searchParams] = useSearchParams()
   const buscaAtual = searchParams.get('busca') ?? ''
+  const estaNoCatalogo = localizacao.pathname === '/'
 
   const [painelAberto, setPainelAberto] = useState(null) // 'conta' | 'carrinho' | null
   const [menuMobileAberto, setMenuMobileAberto] = useState(false)
@@ -62,7 +64,10 @@ export function Layout({ aoAbrirIntro }) {
 
   return (
     <div className="rg-app-shell">
-      <header className="rg-navbar-wrapper">
+      <header className={`rg-navbar-wrapper ${estaNoCatalogo ? 'rg-navbar-wrapper--catalogo' : ''}`}>
+        <div className="rg-faixa-anuncio">
+          <span>Frete grátis acima de R$ 200 · aproveite nossos cupons e ofertas</span>
+        </div>
         <nav className="navbar navbar-expand-lg rg-navbar" aria-label="Navegação principal">
           <div className="container rg-navbar-inner">
             <Link to="/inicio" className="rg-brand navbar-brand" onClick={fecharMenus}>
