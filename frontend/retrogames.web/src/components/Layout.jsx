@@ -14,7 +14,30 @@ export function Layout({ aoAbrirIntro }) {
 
   const [painelAberto, setPainelAberto] = useState(null) // 'conta' | 'carrinho' | null
   const [menuMobileAberto, setMenuMobileAberto] = useState(false)
+  const [faixaOculta, setFaixaOculta] = useState(false)
   const acoesRef = useRef(null)
+
+  useEffect(() => {
+    let ultimaPosicao = window.scrollY
+
+    function atualizarFaixa() {
+      const posicaoAtual = window.scrollY
+      const diferenca = posicaoAtual - ultimaPosicao
+
+      if (posicaoAtual < 24) {
+        setFaixaOculta(false)
+      } else if (diferenca > 4) {
+        setFaixaOculta(true)
+      } else if (diferenca < -4) {
+        setFaixaOculta(false)
+      }
+
+      ultimaPosicao = posicaoAtual
+    }
+
+    window.addEventListener('scroll', atualizarFaixa, { passive: true })
+    return () => window.removeEventListener('scroll', atualizarFaixa)
+  }, [])
 
   useEffect(() => {
     function aoClicarFora(evento) {
@@ -64,7 +87,7 @@ export function Layout({ aoAbrirIntro }) {
 
   return (
     <div className="rg-app-shell">
-      <header className={`rg-navbar-wrapper ${estaNoCatalogo ? 'rg-navbar-wrapper--catalogo' : ''}`}>
+      <header className={`rg-navbar-wrapper ${estaNoCatalogo ? 'rg-navbar-wrapper--catalogo' : ''} ${faixaOculta ? 'rg-navbar-wrapper--faixa-oculta' : ''}`}>
         <div className="rg-faixa-anuncio">
           <span>Frete grátis acima de R$ 200 · aproveite nossos cupons e ofertas</span>
         </div>
