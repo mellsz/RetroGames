@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { jogoApi } from '../api/servicos'
 import fundoHero from '../assets/arcade/background-hero-inicio.png'
+import { IconeCarrinho } from '../components/IconesNavbar'
 import { formatarPreco } from '../lib/formato'
 
 const TAMANHO_LOTE = 50
@@ -16,6 +17,12 @@ const TITULOS_NOVIDADES = [
   'Phantasy Star IV',
   'Castlevania: Symphony of the Night',
   'Final Fantasy VII',
+]
+const TITULOS_TESOUROS = [
+  'Mario Kart 64',
+  'Super Mario 64',
+  'Chrono Trigger',
+  'Super Metroid',
 ]
 const DESTAQUES_LOCAIS = [
   {
@@ -109,6 +116,114 @@ const NOVIDADES_LOCAIS = [
     generos: ['RPG'],
   },
 ]
+const TESOUROS_LOCAIS = [
+  {
+    id: 17,
+    nome: 'Mario Kart 64',
+    descricao: 'Corridas com personagens do universo Mario.',
+    nomePlataforma: 'Nintendo 64',
+    anoLancamento: 1996,
+    preco: 249.9,
+    estoque: 3,
+    descricaoCondicao: 'Usado',
+    generos: ['Corrida'],
+  },
+  {
+    id: 15,
+    nome: 'Super Mario 64',
+    descricao: 'Aventura de plataforma em três dimensões.',
+    nomePlataforma: 'Nintendo 64',
+    anoLancamento: 1996,
+    preco: 279.9,
+    estoque: 2,
+    descricaoCondicao: 'Usado',
+    generos: ['Plataforma', 'Aventura'],
+  },
+  {
+    id: 5,
+    nome: 'Chrono Trigger',
+    descricao: 'RPG com viagens no tempo.',
+    nomePlataforma: 'Super Nintendo Entertainment System',
+    anoLancamento: 1995,
+    preco: 399.9,
+    estoque: 1,
+    descricaoCondicao: 'Usado',
+    generos: ['RPG', 'Aventura'],
+  },
+  {
+    id: 6,
+    nome: 'Super Metroid',
+    descricao: 'Aventura de ação no planeta Zebes.',
+    nomePlataforma: 'Super Nintendo Entertainment System',
+    anoLancamento: 1994,
+    preco: 279.9,
+    estoque: 2,
+    descricaoCondicao: 'Usado',
+    generos: ['Ação', 'Aventura'],
+  },
+]
+const JOGO_EM_DESTAQUE_LOCAL = {
+  id: 13,
+  nome: 'Tekken 3',
+  descricao: 'Jogo de luta da série Tekken.',
+  nomePlataforma: 'PlayStation',
+  anoLancamento: 1998,
+  preco: 159.9,
+  estoque: 2,
+  descricaoCondicao: 'Usado',
+  generos: ['Luta'],
+}
+const PERGUNTAS_FREQUENTES = [
+  {
+    pergunta: 'Como sei se um jogo está disponível?',
+    resposta: 'Os cards do catálogo mostram o status de cada jogo. Também é possível conferir a disponibilidade na página de detalhes do título.',
+  },
+  {
+    pergunta: 'Como descubro para qual console é o jogo?',
+    resposta: 'A plataforma aparece identificada no card e nos detalhes do jogo. No catálogo, você também pode filtrar os títulos por plataforma.',
+  },
+  {
+    pergunta: 'Qual é a condição dos jogos?',
+    resposta: 'A condição de cada item é informada na página de detalhes, junto com as outras informações do produto.',
+  },
+  {
+    pergunta: 'Como funciona o frete grátis?',
+    resposta: 'A promoção de frete grátis vale para compras acima de R$ 200. Consulte as condições e o prazo de entrega durante a finalização do pedido.',
+  },
+  {
+    pergunta: 'Como adiciono um jogo ao carrinho?',
+    resposta: 'Abra o jogo pelo catálogo e use a opção de adicionar ao carrinho. Você pode conferir seus itens no ícone do carrinho na navegação.',
+  },
+  {
+    pergunta: 'Os jogos são verificados antes de serem anunciados?',
+    resposta: 'Sim. A RetroGames prioriza clássicos testados e prontos para jogar; cada anúncio também informa a condição do item.',
+  },
+  {
+    pergunta: 'E se eu não encontrar o que procuro?',
+    resposta: 'Envie uma mensagem pelo formulário abaixo. Conte qual jogo ou plataforma está procurando e nossa equipe poderá orientar você.',
+  },
+]
+
+const FAQ_PIXEL_COLUNAS = 320
+const FAQ_PIXEL_DENSIDADE = [0.84, 0.62, 0.4, 0.2]
+const FAQ_PIXEL_OPACIDADE = [0.9, 0.74, 0.56, 0.38]
+const FAQ_PIXELS = Array.from({ length: FAQ_PIXEL_COLUNAS * FAQ_PIXEL_DENSIDADE.length }, (_, indice) => {
+  const coluna = indice % FAQ_PIXEL_COLUNAS
+  const linha = Math.floor(indice / FAQ_PIXEL_COLUNAS)
+  const ruidoDeGrupo = Math.sin((Math.floor(coluna / 4) + 1) * 127.1 + (linha + 1) * 311.7) * 43758.5453
+  const ruidoLocal = Math.sin((coluna + 1) * 269.5 + (linha + 1) * 183.3) * 24634.6345
+  const valorDeGrupo = ruidoDeGrupo - Math.floor(ruidoDeGrupo)
+  const valorLocal = ruidoLocal - Math.floor(ruidoLocal)
+  const preenchimento = valorDeGrupo * 0.75 + valorLocal * 0.25
+
+  if (preenchimento >= FAQ_PIXEL_DENSIDADE[linha]) return null
+
+  return {
+    coluna,
+    linha,
+    opacidade: Math.max(0.2, FAQ_PIXEL_OPACIDADE[linha] + (valorLocal - 0.5) * 0.12),
+  }
+}).filter(Boolean)
 
 const arquivosCapas = import.meta.glob('../assets/jogos/*', {
   eager: true,
@@ -123,10 +238,15 @@ function normalizarNome(valor) {
 function obterCapa(jogo) {
   const capasExatas = {
     [normalizarNome('Super Mario Bros.')]: 'Super_Mario_Bros._box_nintendo.png',
+    [normalizarNome('Tekken 3')]: 'Tekken_3_capa_playstation.png',
     [normalizarNome('The Legend of Zelda')]: 'The_Legend_of_Zelda_1_capa_nintendo.png',
     [normalizarNome('Sonic the Hedgehog 2')]: 'Sonic_Megadrive.jpg',
     [normalizarNome('Mega Man 2')]: 'Megaman2_box_Nintendo.jpg',
     [normalizarNome('Phantasy Star IV')]: 'Phantasy_Star_EotM_cover_MegaDrive.jpg',
+    [normalizarNome('Mario Kart 64')]: 'Mario_Kart_64_nintendo64.jpg',
+    [normalizarNome('Super Mario 64')]: 'Super_Mario_64_front_nintendo64.jpg',
+    [normalizarNome('Chrono Trigger')]: 'Chrono_Trigger_SuperNintendo.jpg',
+    [normalizarNome('Super Metroid')]: 'Super_Metroid_SuperNintendo.jpg',
   }
   const arquivo = capasExatas[normalizarNome(jogo.nome)]
     ?? Object.keys(arquivosCapas).find((caminho) => normalizarNome(caminho.split('/').pop()).includes(normalizarNome(jogo.nome)))
@@ -171,6 +291,19 @@ function CartaoJogoInicio({ jogo }) {
   )
 }
 
+function FaixaPixelsFaq({ posicao }) {
+  return (
+    <div className={`rg-inicio-faq-pixel-banda rg-inicio-faq-pixel-banda--${posicao}`} aria-hidden="true">
+      {FAQ_PIXELS.map(({ coluna, linha, opacidade }) => (
+        <i
+          key={`${coluna}-${linha}`}
+          style={{ gridColumnStart: coluna + 1, gridRowStart: linha + 2, opacity: opacidade }}
+        />
+      ))}
+    </div>
+  )
+}
+
 function ordenarDestaques(jogos) {
   const selecionados = TITULOS_DESTAQUE
     .map((titulo) => jogos.find((jogo) => normalizarNome(jogo.nome) === normalizarNome(titulo)))
@@ -193,10 +326,42 @@ function ordenarNovidades(jogos) {
   return [...selecionados, ...restantes].slice(0, 4)
 }
 
+function ordenarTesouros(jogos) {
+  return TITULOS_TESOUROS
+    .map((titulo) => jogos.find((jogo) => normalizarNome(jogo.nome) === normalizarNome(titulo)))
+    .filter(Boolean)
+}
+
+function atualizarInclinacaoBeneficio(event) {
+  if (event.pointerType !== 'mouse') return
+
+  const cartao = event.currentTarget
+  const limites = cartao.getBoundingClientRect()
+  const posicaoX = (event.clientX - limites.left) / limites.width
+  const posicaoY = (event.clientY - limites.top) / limites.height
+
+  cartao.style.setProperty('--rg-beneficio-tilt-x', `${(0.5 - posicaoY) * 8}deg`)
+  cartao.style.setProperty('--rg-beneficio-tilt-y', `${(posicaoX - 0.5) * 8}deg`)
+  cartao.style.setProperty('--rg-beneficio-luz-x', `${posicaoX * 100}%`)
+  cartao.style.setProperty('--rg-beneficio-luz-y', `${posicaoY * 100}%`)
+}
+
+function resetarInclinacaoBeneficio(event) {
+  const cartao = event.currentTarget
+  cartao.style.setProperty('--rg-beneficio-tilt-x', '0deg')
+  cartao.style.setProperty('--rg-beneficio-tilt-y', '0deg')
+  cartao.style.setProperty('--rg-beneficio-luz-x', '50%')
+  cartao.style.setProperty('--rg-beneficio-luz-y', '50%')
+}
+
 export function Inicio() {
   const [destaques, setDestaques] = useState(DESTAQUES_LOCAIS)
   const [novidades, setNovidades] = useState(NOVIDADES_LOCAIS)
+  const [tesouros, setTesouros] = useState(TESOUROS_LOCAIS)
+  const [jogoEmDestaque, setJogoEmDestaque] = useState(JOGO_EM_DESTAQUE_LOCAL)
   const [rolando, setRolando] = useState(window.scrollY > 24)
+  const [perguntasAbertas, setPerguntasAbertas] = useState({})
+  const capaDoJogoEmDestaque = obterCapa(jogoEmDestaque)
 
   useEffect(() => {
     function acompanharRolagem() {
@@ -222,6 +387,14 @@ export function Inicio() {
         if (ativo) {
           setDestaques(ordenarDestaques(jogos))
           setNovidades(ordenarNovidades(jogos))
+          const tesourosDoCatalogo = ordenarTesouros(jogos)
+          if (tesourosDoCatalogo.length === TITULOS_TESOUROS.length) {
+            setTesouros(tesourosDoCatalogo)
+          }
+          const tekken = jogos.find(
+            (jogo) => normalizarNome(jogo.nome) === normalizarNome('Tekken 3'),
+          )
+          if (tekken) setJogoEmDestaque(tekken)
         }
       } catch {
         // Os destaques locais mantêm a página preenchida enquanto a API não responde.
@@ -321,6 +494,200 @@ export function Inicio() {
             ))}
           </div>
         )}
+      </section>
+
+      <section className="rg-inicio-destaque" aria-labelledby="titulo-jogo-em-destaque">
+        <div className="rg-inicio-destaque-capa">
+          {capaDoJogoEmDestaque ? (
+            <img
+              src={capaDoJogoEmDestaque}
+              alt={`Capa de ${jogoEmDestaque.nome}`}
+              loading="lazy"
+            />
+          ) : (
+            <span className="rg-inicio-jogo-sem-capa">{jogoEmDestaque.nome}</span>
+          )}
+          <span className="rg-inicio-destaque-selo">Destaque da semana</span>
+        </div>
+
+        <div className="rg-inicio-destaque-conteudo">
+          <div className="rg-inicio-destaque-meta">
+            <p className="rg-inicio-destaque-etiqueta">
+              {[jogoEmDestaque.generos?.[0], jogoEmDestaque.anoLancamento, jogoEmDestaque.nomePlataforma]
+                .filter(Boolean)
+                .join(' · ')}
+            </p>
+            {jogoEmDestaque.estoque > 0 ? (
+              <span className="rg-badge-disponivel">Disponível</span>
+            ) : (
+              <span className="rg-badge-esgotado">Esgotado</span>
+            )}
+          </div>
+          <h2 id="titulo-jogo-em-destaque">{jogoEmDestaque.nome}</h2>
+          <p className="rg-inicio-destaque-descricao">
+            {jogoEmDestaque.descricao?.trim() || 'Descrição não cadastrada para este jogo.'}
+          </p>
+
+          <div className="rg-inicio-destaque-compra">
+            <div className="rg-inicio-destaque-preco">
+              <span>Por</span>
+              <strong>{formatarPreco(jogoEmDestaque.preco)}</strong>
+            </div>
+            <button
+              type="button"
+              className="rg-inicio-destaque-botao"
+              disabled={jogoEmDestaque.estoque <= 0}
+            >
+              {jogoEmDestaque.estoque <= 0 ? 'Esgotado' : 'Adicionar ao carrinho'}
+              <IconeCarrinho />
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section className="rg-inicio-semana rg-inicio-semana--tesouros" aria-labelledby="titulo-tesouros">
+        <div className="rg-inicio-semana-cabecalho">
+          <div className="rg-inicio-semana-titulos">
+            <p className="rg-inicio-semana-etiqueta">Jogos clássicos e raridades</p>
+            <h2 id="titulo-tesouros">Tesouros do Arcade</h2>
+          </div>
+          <Link to="/" className="rg-inicio-ver-todos">
+            Ver todos <span aria-hidden="true">➜</span>
+          </Link>
+        </div>
+        {tesouros.length > 0 && (
+          <div className="rg-inicio-jogos">
+            {tesouros.map((jogo) => (
+              <CartaoJogoInicio key={jogo.id} jogo={jogo} />
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section className="rg-inicio-beneficios" aria-labelledby="titulo-beneficios">
+        <header className="rg-inicio-beneficios-cabecalho">
+          <p className="rg-inicio-beneficios-sobre">Sobre a RetroGames</p>
+          <h2 id="titulo-beneficios">Por que escolher a RetroGames?</h2>
+          <span className="rg-inicio-beneficios-sublinhado" aria-hidden="true" />
+          <p className="rg-inicio-beneficios-descricao">
+            Mais do que jogos, uma viagem por gerações de histórias e aventuras.
+          </p>
+        </header>
+
+        <div className="rg-inicio-beneficios-grade">
+          <article className="rg-inicio-beneficio" onPointerMove={atualizarInclinacaoBeneficio} onPointerLeave={resetarInclinacaoBeneficio}>
+            <span className="rg-inicio-beneficio-icone rg-inicio-beneficio-icone--classicos" aria-hidden="true" />
+            <h3>Clássicos inesquecíveis</h3>
+            <p>Reviva jogos que marcaram gerações e fizeram história.</p>
+          </article>
+          <article className="rg-inicio-beneficio" onPointerMove={atualizarInclinacaoBeneficio} onPointerLeave={resetarInclinacaoBeneficio}>
+            <span className="rg-inicio-beneficio-icone rg-inicio-beneficio-icone--plataformas" aria-hidden="true" />
+            <h3>Diversidade de plataformas</h3>
+            <p>Explore jogos de diferentes consoles e gerações.</p>
+          </article>
+          <article className="rg-inicio-beneficio" onPointerMove={atualizarInclinacaoBeneficio} onPointerLeave={resetarInclinacaoBeneficio}>
+            <span className="rg-inicio-beneficio-icone rg-inicio-beneficio-icone--aventuras" aria-hidden="true" />
+            <h3>Descubra novas aventuras</h3>
+            <p>Encontre títulos, gêneros e experiências para explorar.</p>
+          </article>
+          <article className="rg-inicio-beneficio" onPointerMove={atualizarInclinacaoBeneficio} onPointerLeave={resetarInclinacaoBeneficio}>
+            <span className="rg-inicio-beneficio-icone rg-inicio-beneficio-icone--nostalgia" aria-hidden="true" />
+            <h3>Nostalgia em cada jogo</h3>
+            <p>Uma experiência dedicada aos apaixonados pelo universo.</p>
+          </article>
+        </div>
+      </section>
+
+      <section className="rg-inicio-faq" aria-labelledby="titulo-inicio-faq">
+        <header className="rg-inicio-faq-cabecalho">
+          <p className="rg-inicio-faq-etiqueta">Central do jogador</p>
+          <h2 id="titulo-inicio-faq" className="rg-inicio-faq-titulo">
+            A gente entende<br />de <span>retrô</span>
+          </h2>
+          <div className="rg-inicio-faq-pacman-trilha" aria-hidden="true">
+            <span className="rg-inicio-faq-pacman-pontos">
+              {Array.from({ length: 30 }, (_, indice) => <i key={indice} />)}
+            </span>
+            <span className="rg-inicio-faq-pacman" />
+          </div>
+          <p className="rg-inicio-faq-subtitulo">
+            Tire suas dúvidas e aproveite cada clássico com tranquilidade.
+          </p>
+        </header>
+
+        <div className="rg-inicio-faq-lista-area">
+          <div className="rg-inicio-faq-lista-titulo">
+            <h3>Perguntas frequentes</h3>
+            <span aria-hidden="true" />
+          </div>
+          <div className="rg-inicio-faq-lista">
+            {PERGUNTAS_FREQUENTES.map(({ pergunta, resposta }, indice) => {
+              const aberta = Boolean(perguntasAbertas[pergunta])
+              const idPergunta = `inicio-faq-pergunta-${indice}`
+              const idResposta = `inicio-faq-resposta-${indice}`
+
+              return (
+                <article
+                  className={`rg-inicio-faq-item${aberta ? ' rg-inicio-faq-item--aberto' : ''}`}
+                  key={pergunta}
+                >
+                  <button
+                    id={idPergunta}
+                    type="button"
+                    className="rg-inicio-faq-pergunta"
+                    aria-expanded={aberta}
+                    aria-controls={idResposta}
+                    onClick={() => setPerguntasAbertas((atuais) => ({
+                      ...atuais,
+                      [pergunta]: !atuais[pergunta],
+                    }))}
+                  >
+                    <span>{pergunta}</span>
+                    <i aria-hidden="true" />
+                  </button>
+                  <div
+                    id={idResposta}
+                    className="rg-inicio-faq-resposta"
+                    role="region"
+                    aria-labelledby={idPergunta}
+                    aria-hidden={!aberta}
+                  >
+                    <p>{resposta}</p>
+                  </div>
+                </article>
+              )
+            })}
+          </div>
+        </div>
+
+        <div className="rg-inicio-faq-cenario">
+          <FaixaPixelsFaq posicao="topo" />
+          <div className="rg-inicio-faq-formulario">
+            <p className="rg-inicio-faq-formulario-etiqueta">Suporte ao jogador</p>
+            <h3>Fale conosco</h3>
+            <p className="rg-inicio-faq-formulario-intro">
+              Ficou com alguma dúvida? Mande uma mensagem para a equipe RetroGames.
+            </p>
+            <form action="mailto:atendimento@retrogames.local?subject=Contato%20pelo%20site" method="post" encType="text/plain">
+              <div className="rg-inicio-faq-formulario-campos">
+                <label>
+                  <span>Seu nome</span>
+                  <input type="text" name="Nome" placeholder="Como podemos chamar você?" autoComplete="name" required />
+                </label>
+                <label>
+                  <span>Seu e-mail</span>
+                  <input type="email" name="E-mail" placeholder="voce@exemplo.com" autoComplete="email" required />
+                </label>
+              </div>
+              <label className="rg-inicio-faq-formulario-mensagem">
+                <span>Sua mensagem</span>
+                <textarea name="Mensagem" rows="4" placeholder="Escreva sua dúvida ou mensagem..." required />
+              </label>
+              <button type="submit" className="rg-inicio-faq-enviar">Enviar mensagem</button>
+            </form>
+          </div>
+          <FaixaPixelsFaq posicao="base" />
+        </div>
       </section>
     </section>
   )
