@@ -19,24 +19,112 @@ export function Layout({ aoAbrirIntro }) {
 
   useEffect(() => {
     let ultimaPosicao = window.scrollY
+    let direcaoIntencional = 0
+    let intencaoExpiraEm = 0
+    let numeroIntencoes = 0
+    let ultimaIntencaoProcessada = 0
+    let posicaoToqueAnterior = null
+
+    function registrarIntencao(direcao) {
+      if (direcao === 0) return
+      direcaoIntencional = Math.sign(direcao)
+      intencaoExpiraEm = Date.now() + 180
+      numeroIntencoes += 1
+    }
+
+    function aoUsarRoda(evento) {
+      registrarIntencao(evento.deltaY)
+    }
+
+    function aoIniciarToque(evento) {
+      direcaoIntencional = 0
+      intencaoExpiraEm = 0
+      ultimaIntencaoProcessada = numeroIntencoes
+      posicaoToqueAnterior = evento.touches[0]?.clientY ?? null
+    }
+
+    function aoMoverToque(evento) {
+      const posicaoAtual = evento.touches[0]?.clientY
+      if (posicaoToqueAnterior === null || posicaoAtual === undefined) return
+
+      // O conteúdo rola no sentido oposto ao movimento do dedo.
+      registrarIntencao(posicaoToqueAnterior - posicaoAtual)
+      posicaoToqueAnterior = posicaoAtual
+    }
+
+    function aoPressionarTecla(evento) {
+      direcaoIntencional = 0
+      intencaoExpiraEm = 0
+      ultimaIntencaoProcessada = numeroIntencoes
+      const elemento = evento.target
+      if (
+        elemento instanceof HTMLElement &&
+        (elemento.isContentEditable || elemento.closest('input, textarea, select, button, a'))
+      ) return
+
+      const direcoesPorTecla = {
+        ArrowDown: 1,
+        PageDown: 1,
+        End: 1,
+        ArrowUp: -1,
+        PageUp: -1,
+        Home: -1,
+      }
+
+      if (evento.code === 'Space') {
+        registrarIntencao(evento.shiftKey ? -1 : 1)
+      } else {
+        registrarIntencao(direcoesPorTecla[evento.key] ?? 0)
+      }
+    }
+
+    function aoInteragir() {
+      // Uma mudança de filtro pode reposicionar a página; não conte isso como rolagem.
+      direcaoIntencional = 0
+      intencaoExpiraEm = 0
+      ultimaIntencaoProcessada = numeroIntencoes
+    }
+
+    function aoFinalizarToque() {
+      posicaoToqueAnterior = null
+    }
 
     function atualizarFaixa() {
       const posicaoAtual = window.scrollY
       const diferenca = posicaoAtual - ultimaPosicao
+      const intencaoNova = numeroIntencoes > ultimaIntencaoProcessada && Date.now() <= intencaoExpiraEm
 
       if (posicaoAtual < 24) {
         setFaixaOculta(false)
-      } else if (diferenca > 4) {
-        setFaixaOculta(true)
-      } else if (diferenca < -4) {
-        setFaixaOculta(false)
+      } else if (intencaoNova) {
+        ultimaIntencaoProcessada = numeroIntencoes
+        if (diferenca > 4 && direcaoIntencional > 0) {
+          setFaixaOculta(true)
+        } else if (diferenca < -4 && direcaoIntencional < 0) {
+          setFaixaOculta(false)
+        }
       }
 
       ultimaPosicao = posicaoAtual
     }
 
     window.addEventListener('scroll', atualizarFaixa, { passive: true })
-    return () => window.removeEventListener('scroll', atualizarFaixa)
+    window.addEventListener('wheel', aoUsarRoda, { passive: true })
+    window.addEventListener('touchstart', aoIniciarToque, { passive: true })
+    window.addEventListener('touchmove', aoMoverToque, { passive: true })
+    window.addEventListener('touchend', aoFinalizarToque, { passive: true })
+    window.addEventListener('pointerdown', aoInteragir, { passive: true })
+    window.addEventListener('keydown', aoPressionarTecla)
+
+    return () => {
+      window.removeEventListener('scroll', atualizarFaixa)
+      window.removeEventListener('wheel', aoUsarRoda)
+      window.removeEventListener('touchstart', aoIniciarToque)
+      window.removeEventListener('touchmove', aoMoverToque)
+      window.removeEventListener('touchend', aoFinalizarToque)
+      window.removeEventListener('pointerdown', aoInteragir)
+      window.removeEventListener('keydown', aoPressionarTecla)
+    }
   }, [])
 
   useEffect(() => {
