@@ -96,6 +96,15 @@ public sealed class JogoGeneroRepository : RepositoryBase, IJogoGeneroRepository
         await ExecutarGravacaoAsync(comando);
     }
 
+    public async Task<bool> PossuiJogosDoGeneroAsync(int idGenero)
+    {
+        const string sql = "SELECT EXISTS(SELECT 1 FROM tb_jogo_genero WHERE co_genero = @id);";
+        await using var conexao = await AbrirConexaoAsync();
+        await using var comando = CriarComando(conexao, sql);
+        AdicionarParametro(comando, "@id", idGenero);
+        return Convert.ToInt32(await comando.ExecuteScalarAsync()) != 0;
+    }
+
     private static JogoGenero Mapear(MySqlDataReader leitor)
     {
         return new JogoGenero

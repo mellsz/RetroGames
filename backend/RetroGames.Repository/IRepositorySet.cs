@@ -13,4 +13,12 @@ public interface IRepositorySet
     ICondicaoJogoRepository CondicaoJogo { get; }
 
     IUsuarioRepository Usuario { get; }
+
+    IMensagemContatoRepository MensagemContato { get; }
+
+    IPedidoRepository Pedido { get; }
+
+    IItemPedidoRepository ItemPedido { get; }
+
+    ISituacaoPedidoRepository SituacaoPedido { get; }
 }

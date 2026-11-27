@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import logoRetroGames from '../assets/logo-retrogames.png'
 import { IconeCarrinho, IconeLupa, IconePessoa } from './IconesNavbar'
+import { useAutenticacao } from '../contexts/AutenticacaoContext'
+import { useCarrinho } from '../contexts/CarrinhoContext'
 
 const ANO_ATUAL = new Date().getFullYear()
 
@@ -11,6 +13,8 @@ export function Layout({ aoAbrirIntro }) {
   const [searchParams] = useSearchParams()
   const buscaAtual = searchParams.get('busca') ?? ''
   const estaNoCatalogo = localizacao.pathname === '/'
+  const { usuario, estaAutenticado, ehAdministrador, sair } = useAutenticacao()
+  const { totalItens } = useCarrinho()
 
   const [painelAberto, setPainelAberto] = useState(null) // 'conta' | 'carrinho' | null
   const [menuMobileAberto, setMenuMobileAberto] = useState(false)
@@ -173,6 +177,12 @@ export function Layout({ aoAbrirIntro }) {
     setPainelAberto(null)
   }
 
+  async function aoSair() {
+    await sair()
+    fecharMenus()
+    navigate('/inicio')
+  }
+
   return (
     <div className="rg-app-shell">
       <header className={`rg-navbar-wrapper ${estaNoCatalogo ? 'rg-navbar-wrapper--catalogo' : ''} ${faixaOculta ? 'rg-navbar-wrapper--faixa-oculta' : ''}`}>
@@ -222,6 +232,14 @@ export function Layout({ aoAbrirIntro }) {
                     Contato
                   </NavLink>
                 </li>
+                {ehAdministrador && (
+                  <li className="nav-item">
+                    <NavLink to="/admin" className="rg-nav-link nav-link" onClick={fecharMenus}>
+                      Administração
+                    </NavLink>
+                  </li>
+                )}
+                {estaAutenticado && !ehAdministrador && <li className="nav-item"><NavLink to="/meus-pedidos" className="rg-nav-link nav-link" onClick={fecharMenus}>Meus pedidos</NavLink></li>}
               </ul>
 
               <div className="rg-navbar-actions" ref={acoesRef}>
@@ -245,56 +263,31 @@ export function Layout({ aoAbrirIntro }) {
                     <button
                       type="button"
                       className={`rg-icon-btn ${painelAberto === 'conta' ? 'is-active' : ''}`}
-                      aria-label="Conta, login e administração"
-                      aria-expanded={painelAberto === 'conta'}
-                      onClick={() => alternarPainel('conta')}
+                      aria-label={estaAutenticado ? 'Opções da conta' : 'Entrar ou criar conta'}
+                      aria-expanded={estaAutenticado && painelAberto === 'conta'}
+                      onClick={() => {
+                        if (estaAutenticado) alternarPainel('conta')
+                        else {
+                          fecharMenus()
+                          navigate('/login')
+                        }
+                      }}
                     >
                       <IconePessoa />
                     </button>
 
-                    {painelAberto === 'conta' && (
+                    {estaAutenticado && painelAberto === 'conta' && (
                       <div className="rg-nav-popover" role="dialog" aria-label="Área da conta">
-                        <p className="rg-nav-popover-titulo mb-1">Conta e Acesso</p>
-                        <p className="small mb-2" style={{ color: 'var(--rg-text-secondary)' }}>
-                          Gerenciamento de login, cadastro e área administrativa em preparação na Sprint 15.
-                        </p>
-                        {aoAbrirIntro && (
-                          <button
-                            type="button"
-                            className="btn btn-sm rg-btn-secondary w-100"
-                            onClick={() => {
-                              fecharMenus()
-                              aoAbrirIntro()
-                            }}
-                          >
-                            Ver abertura Arcade
-                          </button>
-                        )}
+                        <p className="rg-nav-popover-titulo mb-1">Conta de {usuario?.nome}</p>
+                        <p className="rg-nav-popover-email">{usuario?.email}</p>
+                        {ehAdministrador && <Link to="/admin" className="rg-nav-popover-link" onClick={fecharMenus}>Administração</Link>}
+                        {!ehAdministrador && <Link to="/meus-pedidos" className="rg-nav-popover-link" onClick={fecharMenus}>Meus pedidos</Link>}
+                        <button type="button" className="btn btn-sm rg-btn-secondary w-100" onClick={aoSair}>Sair da conta</button>
                       </div>
                     )}
                   </div>
 
-                  <div className="position-relative">
-                    <button
-                      type="button"
-                      className={`rg-icon-btn rg-cart-btn ${painelAberto === 'carrinho' ? 'is-active' : ''}`}
-                      aria-label="Carrinho de compras (0 itens)"
-                      aria-expanded={painelAberto === 'carrinho'}
-                      onClick={() => alternarPainel('carrinho')}
-                    >
-                      <IconeCarrinho />
-                      <span className="rg-cart-badge">0</span>
-                    </button>
-
-                    {painelAberto === 'carrinho' && (
-                      <div className="rg-nav-popover" role="dialog" aria-label="Resumo do carrinho">
-                        <p className="rg-nav-popover-titulo mb-1">Seu Carrinho (0)</p>
-                        <p className="small mb-0" style={{ color: 'var(--rg-text-secondary)' }}>
-                          O módulo de carrinho e pedidos será ativado na etapa de compras da Sprint 15.
-                        </p>
-                      </div>
-                    )}
-                  </div>
+                  {!ehAdministrador && <div className="position-relative"><Link to="/carrinho" className="rg-icon-btn rg-cart-btn" aria-label={`Carrinho de compras (${totalItens} itens)`} onClick={fecharMenus}><IconeCarrinho /><span className="rg-cart-badge">{totalItens}</span></Link></div>}
                 </div>
               </div>
             </div>

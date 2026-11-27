@@ -4,6 +4,7 @@ import { jogoApi } from '../../api/servicos'
 import { obterMensagemErro } from '../../api/erros'
 import { formatarPreco } from '../../lib/formato'
 import { Carregando, MensagemErro } from '../../components/MensagensEstado'
+import { useCarrinho } from '../../contexts/CarrinhoContext'
 
 export function DetalheJogo() {
   const { id } = useParams()
@@ -12,6 +13,8 @@ export function DetalheJogo() {
   const [carregando, setCarregando] = useState(true)
   const [erro, setErro] = useState(null)
   const [tentativa, setTentativa] = useState(0)
+  const [adicionado, setAdicionado] = useState('')
+  const { adicionar } = useCarrinho()
 
   useEffect(() => {
     let ativo = true
@@ -91,15 +94,21 @@ export function DetalheJogo() {
               </div>
 
               <div className="my-4 text-center">
-                <p className="rg-font-pixel mb-2" style={{ fontSize: '0.78rem', color: 'var(--rg-violet)' }}>
-                  CARTRIDGE EDITION
-                </p>
-                <h2 className="h4 fw-bold mb-1" style={{ color: 'var(--rg-yellow)' }}>
-                  {jogo.nome}
-                </h2>
-                <p className="mb-0 small" style={{ color: 'var(--rg-text-secondary)' }}>
-                  Lançamento: {jogo.anoLancamento}
-                </p>
+                {jogo.imagem ? (
+                  <img className="rg-detalhe-capa-upload" src={jogo.imagem} alt={`Capa de ${jogo.nome}`} />
+                ) : (
+                  <>
+                    <p className="rg-font-pixel mb-2" style={{ fontSize: '0.78rem', color: 'var(--rg-violet)' }}>
+                      CARTRIDGE EDITION
+                    </p>
+                    <h2 className="h4 fw-bold mb-1" style={{ color: 'var(--rg-yellow)' }}>
+                      {jogo.nome}
+                    </h2>
+                    <p className="mb-0 small" style={{ color: 'var(--rg-text-secondary)' }}>
+                      Lançamento: {jogo.anoLancamento}
+                    </p>
+                  </>
+                )}
               </div>
 
               <div className="d-flex justify-content-between align-items-center small pt-2 border-top" style={{ borderColor: 'rgba(59, 31, 140, 0.5)' }}>
@@ -157,6 +166,8 @@ export function DetalheJogo() {
             </div>
 
             <div className="mt-auto d-grid gap-2">
+              <button type="button" className="rg-btn-primary" disabled={esgotado || jogo.ativo === false} onClick={() => setAdicionado(adicionar(jogo) ? 'Jogo adicionado ao carrinho.' : 'Limite de quantidade ou estoque atingido.')}>{esgotado ? 'Esgotado' : 'Adicionar ao carrinho'}</button>
+              {adicionado && <p role="status" className="rg-form-sucesso">{adicionado} <Link to="/carrinho">Ver carrinho</Link></p>}
               <div className="rg-detalhe-selo">
                 Mídia física original verificada · Funcionando perfeitamente
               </div>

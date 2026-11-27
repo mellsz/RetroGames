@@ -16,6 +16,8 @@ public static class AutorizacaoConfig
 
             options.AddPolicy(Politicas.Administrador, politica =>
                 politica.RequireRole("Administrador"));
+            options.AddPolicy(Politicas.Cliente, politica =>
+                politica.RequireRole("Cliente"));
         });
 
         return services;

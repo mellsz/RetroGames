@@ -40,7 +40,7 @@ function obterCapa(nomeJogo) {
 
 export function CardJogo({ jogo }) {
   const esgotado = jogo.estoque <= 0
-  const capa = obterCapa(jogo.nome)
+  const capa = jogo.imagem ?? obterCapa(jogo.nome)
 
   return (
     <article className={`rg-card-jogo ${esgotado ? 'rg-card-jogo--esgotado' : ''}`}>

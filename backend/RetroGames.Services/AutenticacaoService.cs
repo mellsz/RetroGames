@@ -37,6 +37,35 @@ public sealed class AutenticacaoService : IAutenticacaoService
             : null;
     }
 
+    public async Task<Usuario> CadastrarClienteAsync(string nome, string email, string senha)
+    {
+        var emailNormalizado = email.Trim().ToLowerInvariant();
+        if (await _repositorio.Usuario.BuscarPorEmailAsync(emailNormalizado) is not null)
+        {
+            throw new BusinessRuleException(BusinessErrors.USUARIO_EMAIL_DUPLICADO);
+        }
+
+        var cliente = new Usuario
+        {
+            Nome = nome.Trim(),
+            Email = emailNormalizado,
+            Ativo = true,
+            DataCadastro = DateTime.UtcNow,
+            IdPerfil = PerfilIds.Cliente,
+        };
+        cliente.SenhaHash = _passwordHasher.HashPassword(cliente, senha);
+
+        try
+        {
+            cliente.Id = await _repositorio.Usuario.InserirAsync(cliente);
+            return cliente;
+        }
+        catch (RegistroDuplicadoException)
+        {
+            throw new BusinessRuleException(BusinessErrors.USUARIO_EMAIL_DUPLICADO);
+        }
+    }
+
     public async Task GarantirAdministradorInicialAsync(string email, string senha)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(email);

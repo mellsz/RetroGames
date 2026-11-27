@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Http;
+
 namespace RetroGames.WebApi.ApiModels;
 
 public class InserirJogoRequestApiModel
@@ -17,4 +19,6 @@ public class InserirJogoRequestApiModel
     public int IdCondicaoJogo { get; set; }
 
     public List<int> IdsGeneros { get; set; } = [];
+
+    public IFormFile? Imagem { get; set; }
 }

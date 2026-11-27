@@ -11,6 +11,9 @@ public class Jogo
     /// <summary>Coluna ds_jogo.</summary>
     public string? Descricao { get; set; }
 
+    /// <summary>Coluna ds_imagem.</summary>
+    public string? Imagem { get; set; }
+
     /// <summary>Coluna nu_ano_lancamento.</summary>
     public int AnoLancamento { get; set; }
 

@@ -11,4 +11,5 @@ public interface IJogoGeneroRepository
     Task InserirAsync(JogoGenero jogoGenero);
 
     Task RemoverPorJogoAsync(int idJogo);
+    Task<bool> PossuiJogosDoGeneroAsync(int idGenero);
 }

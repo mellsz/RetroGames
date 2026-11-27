@@ -47,6 +47,28 @@ public sealed class AutenticacaoController : ControllerBase
         });
     }
 
+    [AllowAnonymous]
+    [HttpPost("cadastrar")]
+    public async Task<ActionResult<RetroGamesResponseApiModel<UsuarioLogadoResponseApiModel>>> Cadastrar(
+        [FromBody] CadastrarUsuarioRequestApiModel? request)
+    {
+        var requestRecebido = request!;
+        var usuario = await _service.CadastrarClienteAsync(
+            requestRecebido.Nome,
+            requestRecebido.Email,
+            requestRecebido.Senha);
+
+        await HttpContext.SignInAsync(
+            CookieAuthenticationDefaults.AuthenticationScheme,
+            usuario.ParaClaimsPrincipal());
+
+        return StatusCode(StatusCodes.Status201Created, new RetroGamesResponseApiModel<UsuarioLogadoResponseApiModel>
+        {
+            ResponseCode = ResponseCodes.SUCESSO,
+            Data = usuario.ParaResponse(),
+        });
+    }
+
     [Authorize]
     [HttpPost("logout")]
     public async Task<ActionResult<RetroGamesResponseApiModel>> Logout()

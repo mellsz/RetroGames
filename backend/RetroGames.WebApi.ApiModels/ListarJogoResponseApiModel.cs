@@ -6,6 +6,8 @@ public class ListarJogoResponseApiModel
 
     public string Nome { get; set; } = string.Empty;
 
+    public string? Imagem { get; set; }
+
     public int AnoLancamento { get; set; }
 
     public decimal Preco { get; set; }

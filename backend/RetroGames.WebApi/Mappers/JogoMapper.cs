@@ -56,6 +56,7 @@ public static class JogoMapper
         {
             Id = detalhe.Jogo.Id,
             Nome = detalhe.Jogo.Nome,
+            Imagem = detalhe.Jogo.Imagem,
             AnoLancamento = detalhe.Jogo.AnoLancamento,
             Preco = detalhe.Jogo.Preco,
             Estoque = detalhe.Jogo.Estoque,
@@ -75,6 +76,7 @@ public static class JogoMapper
             Id = detalhe.Jogo.Id,
             Nome = detalhe.Jogo.Nome,
             Descricao = detalhe.Jogo.Descricao,
+            Imagem = detalhe.Jogo.Imagem,
             AnoLancamento = detalhe.Jogo.AnoLancamento,
             Preco = detalhe.Jogo.Preco,
             Estoque = detalhe.Jogo.Estoque,

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using RetroGames.Model.Model;
 using RetroGames.Repository;
 using RetroGames.Services;
+using RetroGames.WebApi.Services;
 
 namespace RetroGames.WebApi.Configuration;
 
@@ -20,6 +21,10 @@ public static class InjecaoDependenciaConfig
         services.AddScoped<IGeneroRepository, GeneroRepository>();
         services.AddScoped<ICondicaoJogoRepository, CondicaoJogoRepository>();
         services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+        services.AddScoped<IMensagemContatoRepository, MensagemContatoRepository>();
+        services.AddScoped<IPedidoRepository, PedidoRepository>();
+        services.AddScoped<IItemPedidoRepository, ItemPedidoRepository>();
+        services.AddScoped<ISituacaoPedidoRepository, SituacaoPedidoRepository>();
         services.AddScoped<IRepositorySet, RepositorySet>();
 
         return services;
@@ -33,6 +38,9 @@ public static class InjecaoDependenciaConfig
         services.AddScoped<IJogoService, JogoService>();
         services.AddScoped<IPasswordHasher<Usuario>, PasswordHasher<Usuario>>();
         services.AddScoped<IAutenticacaoService, AutenticacaoService>();
+        services.AddScoped<IMensagemContatoService, MensagemContatoService>();
+        services.AddScoped<IPedidoService, PedidoService>();
+        services.AddScoped<IArmazenamentoImagemJogoService, ArmazenamentoImagemJogoService>();
 
         return services;
     }

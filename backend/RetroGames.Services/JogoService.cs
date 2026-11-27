@@ -107,7 +107,13 @@ public sealed class JogoService : IJogoService
     public async Task DesativarAsync(int id)
     {
         await BuscarJogoExistenteAsync(id);
-        await _repositorio.Jogo.DesativarAsync(id);
+        await _repositorio.Jogo.AtualizarSituacaoAsync(id, ativo: false);
+    }
+
+    public async Task AtivarAsync(int id)
+    {
+        await BuscarJogoExistenteAsync(id);
+        await _repositorio.Jogo.AtualizarSituacaoAsync(id, ativo: true);
     }
 
     private async Task<List<JogoDetalheServiceModel>> MontarDetalhesAsync(IReadOnlyCollection<Jogo> jogos)

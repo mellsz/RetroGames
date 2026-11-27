@@ -4,6 +4,7 @@ using RetroGames.Services;
 using RetroGames.WebApi.ApiModels;
 using RetroGames.WebApi.Configuration;
 using RetroGames.WebApi.Mappers;
+using RetroGames.WebApi.Services;
 
 namespace RetroGames.WebApi.Controllers;
 
@@ -12,10 +13,17 @@ namespace RetroGames.WebApi.Controllers;
 public sealed class JogoController : ControllerBase
 {
     private readonly IJogoService _service;
+    private readonly IUsuarioAtualService _usuarioAtual;
+    private readonly IArmazenamentoImagemJogoService _armazenamentoImagem;
 
-    public JogoController(IJogoService service)
+    public JogoController(
+        IJogoService service,
+        IUsuarioAtualService usuarioAtual,
+        IArmazenamentoImagemJogoService armazenamentoImagem)
     {
         _service = service ?? throw new ArgumentNullException(nameof(service));
+        _usuarioAtual = usuarioAtual ?? throw new ArgumentNullException(nameof(usuarioAtual));
+        _armazenamentoImagem = armazenamentoImagem ?? throw new ArgumentNullException(nameof(armazenamentoImagem));
     }
 
     [HttpGet]
@@ -28,7 +36,7 @@ public sealed class JogoController : ControllerBase
             filtro.Busca,
             filtro.IdPlataforma,
             filtro.IdGenero,
-            filtro.IncluirInativos,
+            filtro.IncluirInativos && _usuarioAtual.EhAdministrador,
             filtro.Pagina,
             filtro.TamanhoPagina);
 
@@ -52,6 +60,10 @@ public sealed class JogoController : ControllerBase
     public async Task<ActionResult<RetroGamesResponseApiModel<ListarPorIdJogoResponseApiModel>>> ListarPorId(int id)
     {
         var jogo = await _service.BuscarPorIdAsync(id);
+        if (!jogo.Jogo.Ativo && !_usuarioAtual.EhAdministrador)
+        {
+            throw new BusinessRuleException(BusinessErrors.JOGO_NAO_ENCONTRADO);
+        }
 
         return Ok(new RetroGamesResponseApiModel<ListarPorIdJogoResponseApiModel>
         {
@@ -63,10 +75,12 @@ public sealed class JogoController : ControllerBase
     [HttpPost]
     [Authorize(Policy = Politicas.Administrador)]
     public async Task<ActionResult<RetroGamesResponseApiModel<ListarPorIdJogoResponseApiModel>>> Inserir(
-        [FromBody] InserirJogoRequestApiModel? request)
+        [FromForm] InserirJogoRequestApiModel? request)
     {
         var requestRecebido = request!;
-        var jogo = await _service.InserirAsync(requestRecebido.ParaModel(), requestRecebido.IdsGeneros);
+        var jogoParaInserir = requestRecebido.ParaModel();
+        jogoParaInserir.Imagem = await _armazenamentoImagem.SalvarAsync(requestRecebido.Imagem, HttpContext.RequestAborted);
+        var jogo = await _service.InserirAsync(jogoParaInserir, requestRecebido.IdsGeneros);
         var detalhe = await _service.BuscarPorIdAsync(jogo.Id);
         var resposta = new RetroGamesResponseApiModel<ListarPorIdJogoResponseApiModel>
         {
@@ -81,10 +95,14 @@ public sealed class JogoController : ControllerBase
     [Authorize(Policy = Politicas.Administrador)]
     public async Task<ActionResult<RetroGamesResponseApiModel<ListarPorIdJogoResponseApiModel>>> Alterar(
         int id,
-        [FromBody] AlterarJogoRequestApiModel? request)
+        [FromForm] AlterarJogoRequestApiModel? request)
     {
         var requestRecebido = request!;
-        await _service.AlterarAsync(requestRecebido.ParaModel(id), requestRecebido.IdsGeneros);
+        var jogoAtual = await _service.BuscarPorIdAsync(id);
+        var jogoParaAlterar = requestRecebido.ParaModel(id);
+        jogoParaAlterar.Imagem = await _armazenamentoImagem.SalvarAsync(requestRecebido.Imagem, HttpContext.RequestAborted)
+            ?? jogoAtual.Jogo.Imagem;
+        await _service.AlterarAsync(jogoParaAlterar, requestRecebido.IdsGeneros);
         var detalhe = await _service.BuscarPorIdAsync(id);
 
         return Ok(new RetroGamesResponseApiModel<ListarPorIdJogoResponseApiModel>
@@ -99,6 +117,18 @@ public sealed class JogoController : ControllerBase
     public async Task<ActionResult<RetroGamesResponseApiModel>> Desativar(int id)
     {
         await _service.DesativarAsync(id);
+
+        return Ok(new RetroGamesResponseApiModel
+        {
+            ResponseCode = ResponseCodes.SUCESSO,
+        });
+    }
+
+    [HttpPatch("{id:int}/ativar")]
+    [Authorize(Policy = Politicas.Administrador)]
+    public async Task<ActionResult<RetroGamesResponseApiModel>> Ativar(int id)
+    {
+        await _service.AtivarAsync(id);
 
         return Ok(new RetroGamesResponseApiModel
         {

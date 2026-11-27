@@ -104,7 +104,7 @@
 
 .rg-navbar {
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   background-color: rgba(10, 11, 20, 0.98);
   border: 1px solid transparent;
   border-bottom-color: rgba(174, 101, 239, 0.76);
@@ -374,6 +374,15 @@
   font-weight: 700;
   font-size: 0.88rem;
   color: var(--rg-yellow);
+}
+
+.rg-nav-popover-email {
+  margin: 0 0 0.75rem;
+  overflow: hidden;
+  color: var(--rg-text-secondary);
+  font-size: 0.78rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .rg-navbar-toggler {
@@ -2017,6 +2026,27 @@
 
 }
 
+/* Compras e pedidos */
+.rg-compras { max-width: 76rem; margin: 2.5rem auto 5rem; color: var(--rg-text-primary); }
+.rg-compras h1 { margin: 0 0 2rem; font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.8rem, 6vw, 5rem); line-height: 1; }
+.rg-compras h2 { font-size: 1.2rem; }
+.rg-compras-grade { display: grid; grid-template-columns: minmax(0, 1fr) minmax(17rem, 21rem); gap: 1.5rem; align-items: start; }
+.rg-compras-item, .rg-compras-resumo, .rg-compras-vazio, .rg-compras-final, .rg-pedido-card { border: 1px solid rgba(157, 36, 255, .42); border-radius: 8px; background: #11121d; padding: 1.25rem; }
+.rg-compras-itens { display: grid; gap: .8rem; }
+.rg-compras-item { display: grid; grid-template-columns: 5.5rem minmax(0, 1fr) auto; gap: 1rem; }
+.rg-compras-item img { width: 5.5rem; height: 7rem; object-fit: contain; background: #080912; }
+.rg-compras-item-info h2 { margin: 0 0 .3rem; }.rg-compras-item-info p, .rg-compras-resumo p, .rg-compras-final p, .rg-pedido-card time { color: var(--rg-text-secondary); }
+.rg-compras-item-info strong, .rg-compras-total strong { color: var(--rg-yellow); }
+.rg-compras-item-acoes { display: grid; gap: .5rem; text-align: right; }.rg-compras-item-acoes label { color: var(--rg-text-secondary); font-size: .8rem; }
+.rg-compras-item-acoes select, .rg-admin-filtro select, .rg-admin-pagina td select { margin-left: .4rem; border: 1px solid rgba(157, 36, 255, .6); border-radius: 5px; background: #080912; color: var(--rg-text-primary); padding: .35rem; }
+.rg-compras-item-acoes button { border: 0; background: none; color: #ff9bc0; }.rg-compras-item-acoes small { color: #ff9bc0; }
+.rg-compras-resumo > div, .rg-compras-final-linha, .rg-compras-total { display: flex; justify-content: space-between; gap: 1rem; padding: .7rem 0; }.rg-compras-resumo > div { border-bottom: 1px solid rgba(255,255,255,.1); }
+.rg-compras-resumo .rg-btn-primary, .rg-compras-final .rg-btn-primary { display: block; width: 100%; margin: 1rem 0; text-align: center; text-decoration: none; }
+.rg-compras-desabilitado { pointer-events: none; opacity: .5; }.rg-compras-final { max-width: 42rem; }.rg-compras-final-linha { border-bottom: 1px solid rgba(255,255,255,.1); }
+.rg-pedidos-lista { display: grid; gap: 1rem; }.rg-pedido-card header { display: flex; justify-content: space-between; gap: 1rem; align-items: start; }.rg-pedido-card ul { margin: 1rem 0; color: var(--rg-text-secondary); }.rg-pedido-card > strong { color: var(--rg-yellow); }
+.rg-admin-filtro { display: block; margin: 1.5rem 0; color: var(--rg-text-secondary); }.rg-admin-pedido-itens { min-width: 13rem; margin: .7rem 0; padding-left: 1.2rem; }
+@media (max-width: 767.98px) { .rg-compras-grade { grid-template-columns: 1fr; }.rg-compras-item { grid-template-columns: 4rem minmax(0, 1fr); }.rg-compras-item img { width: 4rem; height: 5rem; }.rg-compras-item-acoes { grid-column: 1 / -1; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; text-align: left; } }
+
 @media (max-width: 479.98px) {
   .rg-inicio-faq-elemento {
     width: 3.7rem;
@@ -3358,6 +3388,14 @@
   color: var(--rg-text-secondary);
 }
 
+.rg-detalhe-capa-upload {
+  display: block;
+  width: min(100%, 19rem);
+  max-height: 25rem;
+  margin: 0 auto;
+  object-fit: contain;
+}
+
 /* ===== Paleta grafite da vitrine ===== */
 .rg-pagina-catalogo .rg-navbar-wrapper--catalogo .rg-navbar::before,
 .rg-pagina-catalogo .rg-navbar-wrapper--catalogo .rg-navbar::after {
@@ -3520,4 +3558,111 @@
 
 .rg-pagina-catalogo .rg-paginacao .page-item.active .page-link {
   border-color: var(--rg-purple);
+}
+
+/* ===== Autenticação e administração ===== */
+.rg-autenticacao {
+  position: relative;
+  display: grid;
+  width: 100%;
+  min-height: min(46rem, calc(100vh - 8rem));
+  place-items: center;
+  padding: 4rem 1.25rem;
+  overflow: hidden;
+  border: 1px solid rgba(157, 36, 255, 0.52);
+  background: #090a13;
+}
+
+.rg-autenticacao-fundo,
+.rg-autenticacao-sombra {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.rg-autenticacao-fundo { object-fit: cover; object-position: center; opacity: 0.76; }
+.rg-autenticacao-sombra { background: radial-gradient(circle at center, rgba(10, 11, 20, 0.25), rgba(10, 11, 20, 0.88)); }
+
+.rg-autenticacao-cartao {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 26rem);
+  padding: 2rem;
+  border: 1px solid rgba(167, 75, 255, 0.82);
+  border-radius: 12px;
+  background: rgba(10, 11, 20, 0.92);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.42);
+  text-align: center;
+}
+
+.rg-autenticacao-icone { display: block; margin-bottom: 0.7rem; font-size: 2.25rem; filter: drop-shadow(0 0 10px rgba(157, 36, 255, 0.55)); }
+.rg-autenticacao-cartao h1 { margin: 0; color: var(--rg-text-primary); font-family: var(--rg-font-display); font-size: clamp(1.4rem, 3vw, 2rem); }
+.rg-autenticacao-cartao > p { margin: 0.7rem auto 1.5rem; color: var(--rg-text-secondary); line-height: 1.45; }
+.rg-form-campo { display: block; margin-bottom: 0.85rem; color: var(--rg-text-secondary); font-size: 0.84rem; text-align: left; }
+.rg-form-campo > span:first-child { display: block; margin-bottom: 0.35rem; }
+.rg-form-campo input, .rg-admin-formulario input, .rg-admin-formulario textarea, .rg-admin-formulario select, .rg-admin-busca input {
+  width: 100%; border: 1px solid rgba(157, 36, 255, 0.5); border-radius: 7px; background: rgba(4, 5, 12, 0.8); color: var(--rg-text-primary); padding: 0.7rem 0.8rem; outline: none;
+}
+.rg-form-campo input:focus, .rg-admin-formulario input:focus, .rg-admin-formulario textarea:focus, .rg-admin-formulario select:focus, .rg-admin-busca input:focus { border-color: var(--rg-purple-bright); box-shadow: 0 0 0 3px rgba(157, 36, 255, 0.16); }
+.rg-form-senha { display: flex; border: 1px solid rgba(157, 36, 255, 0.5); border-radius: 7px; background: rgba(4, 5, 12, 0.8); }
+.rg-form-senha input { border: 0; background: transparent; }
+.rg-form-senha:focus-within { border-color: var(--rg-purple-bright); box-shadow: 0 0 0 3px rgba(157, 36, 255, 0.16); }
+.rg-form-senha button { border: 0; background: transparent; color: var(--rg-purple-bright); padding: 0 0.75rem; }
+.rg-autenticacao-enviar { width: 100%; margin-top: 0.45rem; }
+.rg-autenticacao-alternar { margin: 1.25rem 0 0 !important; font-size: 0.9rem; }
+.rg-autenticacao-alternar a, .rg-nav-popover-link { color: var(--rg-purple-bright); text-decoration: none; }
+.rg-nav-popover-link { display: block; margin: 0.4rem 0 0.8rem; font-size: 0.88rem; }
+.rg-form-erro { display: block; margin-top: 0.3rem; color: #ff9bc0; line-height: 1.35; }
+.rg-form-alerta, .rg-form-sucesso { margin: 1rem 0 0; padding: 0.72rem 0.85rem; border-radius: 7px; font-size: 0.9rem; }
+.rg-form-alerta { border: 1px solid rgba(255, 104, 160, 0.56); background: rgba(113, 21, 64, 0.28); color: #ffd0df; }
+.rg-form-sucesso { border: 1px solid rgba(68, 218, 158, 0.58); background: rgba(24, 119, 79, 0.24); color: #bfffe1; }
+.rg-autenticacao-verificando { min-height: 14rem; padding-top: 5rem; color: var(--rg-text-secondary); text-align: center; }
+
+.rg-admin-pagina { max-width: 72rem; margin: 2.5rem auto 5rem; }
+.rg-admin-topo { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.rg-admin-voltar { display: inline-flex; width: fit-content; margin: 0 0 0.45rem; color: var(--rg-purple-bright); font-size: 0.86rem; text-decoration: none; }
+.rg-admin-voltar:hover { color: var(--rg-cyan); text-decoration: underline; text-underline-offset: 0.2rem; }
+.rg-admin-etiqueta { margin: 0 0 0.5rem; color: var(--rg-purple-bright); font-family: var(--rg-font-display); font-size: 0.78rem; text-transform: uppercase; }
+.rg-admin-pagina h1 { margin: 0; color: var(--rg-text-primary); font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.7rem, 6vw, 5rem); line-height: 0.94; text-transform: uppercase; }
+.rg-admin-intro { margin: 1rem 0 2rem; color: var(--rg-text-secondary); font-size: 1.05rem; }
+.rg-admin-atalhos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.2rem; }
+.rg-admin-atalhos article, .rg-admin-formulario, .rg-admin-listagem { border: 1px solid rgba(157, 36, 255, 0.45); border-radius: 10px; background: #11121d; padding: 1.35rem; }
+.rg-admin-atalhos h2, .rg-admin-formulario h2, .rg-admin-listagem h2 { margin: 0 0 0.7rem; color: var(--rg-text-primary); font-size: 1.25rem; }
+.rg-admin-atalhos p { min-height: 3rem; color: var(--rg-text-secondary); }
+.rg-admin-acoes-rapidas { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; margin-top: 1.5rem; color: var(--rg-text-secondary); }
+.rg-admin-acoes-rapidas a, .rg-tabela-acoes a { color: var(--rg-purple-bright); }
+.rg-admin-grade { display: grid; grid-template-columns: minmax(17rem, 0.7fr) minmax(0, 1.3fr); gap: 1.5rem; margin-top: 1.5rem; }
+.rg-admin-formulario label { display: block; margin: 0 0 0.8rem; color: var(--rg-text-secondary); font-size: 0.87rem; }
+.rg-admin-ajuda { margin: -0.35rem 0 0.75rem; color: var(--rg-text-muted); font-size: 0.78rem; }
+.rg-admin-formulario label input, .rg-admin-formulario label select, .rg-admin-formulario label textarea { display: block; margin-top: 0.35rem; }
+.rg-admin-formulario textarea { min-height: 7rem; resize: vertical; }
+.rg-admin-botoes, .rg-admin-formulario-linha, .rg-admin-cabecalho-lista, .rg-admin-busca, .rg-admin-paginacao { display: flex; gap: 0.75rem; align-items: center; }
+.rg-admin-botoes { margin-top: 1.2rem; }
+.rg-admin-formulario-linha > label { flex: 1; }
+.rg-admin-formulario fieldset { margin: 0.85rem 0; padding: 0; border: 0; }
+.rg-admin-formulario legend { margin-bottom: 0.4rem; color: var(--rg-text-secondary); font-size: 0.87rem; }
+.rg-admin-generos { display: flex; flex-wrap: wrap; gap: 0.65rem 1rem; }
+.rg-admin-generos label, .rg-admin-checkbox { display: inline-flex !important; gap: 0.4rem; align-items: center; }
+.rg-admin-generos input, .rg-admin-checkbox input { width: auto !important; margin: 0 !important; }
+.rg-admin-cabecalho-lista { justify-content: space-between; margin-bottom: 1.3rem; }
+.rg-admin-busca { max-width: 32rem; margin: 0 0 1.2rem; }
+.rg-admin-busca input { flex: 1; }
+.rg-admin-listagem table, .rg-admin-pagina table { width: 100%; border-collapse: collapse; color: var(--rg-text-secondary); }
+.rg-admin-pagina th, .rg-admin-pagina td { padding: 0.75rem; border-bottom: 1px solid rgba(255, 255, 255, 0.08); text-align: left; }
+.rg-admin-pagina td strong, .rg-admin-pagina td small { display: block; }
+.rg-admin-pagina td small { color: var(--rg-text-muted); }
+.rg-tabela-acoes { display: flex; gap: 0.7rem; align-items: center; }
+.rg-tabela-acoes button { border: 0; background: transparent; color: #ff9bc0; padding: 0; }
+.rg-tabela-acoes .rg-acao-ativar { color: #79f3bf; }
+.rg-status-ativo, .rg-status-inativo { display: inline-block; padding: 0.18rem 0.42rem; border-radius: 99px; font-size: 0.75rem; }
+.rg-status-ativo { background: rgba(24, 119, 79, 0.28); color: #bfffe1; }.rg-status-inativo { background: rgba(124, 55, 80, 0.35); color: #ffc0d4; }
+.rg-admin-paginacao { justify-content: center; margin-top: 1.5rem; color: var(--rg-text-secondary); }
+.rg-admin-paginacao button, .rg-btn-secondary { border: 1px solid rgba(157, 36, 255, 0.65); border-radius: 6px; background: transparent; color: var(--rg-text-primary); padding: 0.55rem 0.8rem; }
+.rg-admin-paginacao button:disabled { opacity: 0.45; }
+.rg-inicio-faq-remetente { margin: 0 0 0.9rem; color: var(--rg-text-secondary); font-size: 0.85rem; }.rg-inicio-faq-login { text-align: center; }.rg-inicio-faq-login p { color: var(--rg-text-secondary); }.rg-inicio-faq-login .rg-inicio-faq-enviar { display: inline-block; text-decoration: none; }
+
+@media (max-width: 767.98px) {
+  .rg-autenticacao { min-height: 37rem; padding: 3rem 0.8rem; }.rg-autenticacao-cartao { padding: 1.5rem 1.1rem; }
+  .rg-admin-atalhos, .rg-admin-grade { grid-template-columns: 1fr; }.rg-admin-formulario-linha { flex-direction: column; gap: 0; }.rg-admin-cabecalho-lista { align-items: flex-end; }.rg-admin-pagina th, .rg-admin-pagina td { white-space: nowrap; }.rg-admin-busca { align-items: stretch; flex-direction: column; }
 }

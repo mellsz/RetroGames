@@ -50,7 +50,7 @@ public sealed class JogoRepository : RepositoryBase, IJogoRepository
 
         var where = filtros.Count == 0 ? string.Empty : $"WHERE {string.Join(" AND ", filtros)}";
         const string colunas = """
-            co_seq_jogo, no_jogo, ds_jogo, nu_ano_lancamento, vl_preco,
+            co_seq_jogo, no_jogo, ds_jogo, ds_imagem, nu_ano_lancamento, vl_preco,
             qt_estoque, st_ativo, dt_cadastro, co_plataforma, co_condicao_jogo
             """;
 
@@ -93,7 +93,7 @@ public sealed class JogoRepository : RepositoryBase, IJogoRepository
     public async Task<Jogo?> BuscarPorIdAsync(int id)
     {
         const string sql = """
-            SELECT co_seq_jogo, no_jogo, ds_jogo, nu_ano_lancamento, vl_preco,
+            SELECT co_seq_jogo, no_jogo, ds_jogo, ds_imagem, nu_ano_lancamento, vl_preco,
                    qt_estoque, st_ativo, dt_cadastro, co_plataforma, co_condicao_jogo
             FROM tb_jogo
             WHERE co_seq_jogo = @id;
@@ -113,10 +113,10 @@ public sealed class JogoRepository : RepositoryBase, IJogoRepository
 
         const string sql = """
             INSERT INTO tb_jogo
-                (no_jogo, ds_jogo, nu_ano_lancamento, vl_preco, qt_estoque,
+                (no_jogo, ds_jogo, ds_imagem, nu_ano_lancamento, vl_preco, qt_estoque,
                  st_ativo, dt_cadastro, co_plataforma, co_condicao_jogo)
             VALUES
-                (@nome, @descricao, @anoLancamento, @preco, @estoque,
+                (@nome, @descricao, @imagem, @anoLancamento, @preco, @estoque,
                  @ativo, @dataCadastro, @idPlataforma, @idCondicaoJogo);
             """;
 
@@ -136,11 +136,11 @@ public sealed class JogoRepository : RepositoryBase, IJogoRepository
             UPDATE tb_jogo
             SET no_jogo = @nome,
                 ds_jogo = @descricao,
+                ds_imagem = @imagem,
                 nu_ano_lancamento = @anoLancamento,
                 vl_preco = @preco,
                 qt_estoque = @estoque,
                 st_ativo = @ativo,
-                dt_cadastro = @dataCadastro,
                 co_plataforma = @idPlataforma,
                 co_condicao_jogo = @idCondicaoJogo
             WHERE co_seq_jogo = @id;
@@ -154,19 +154,48 @@ public sealed class JogoRepository : RepositoryBase, IJogoRepository
         await ExecutarGravacaoAsync(comando);
     }
 
-    public async Task DesativarAsync(int id)
+    public async Task AtualizarSituacaoAsync(int id, bool ativo)
     {
         const string sql = """
             UPDATE tb_jogo
-            SET st_ativo = FALSE
+            SET st_ativo = @ativo
             WHERE co_seq_jogo = @id;
             """;
 
         await using var conexao = await AbrirConexaoAsync();
         await using var comando = CriarComando(conexao, sql);
         AdicionarParametro(comando, "@id", id);
+        AdicionarParametro(comando, "@ativo", ativo);
 
         await ExecutarGravacaoAsync(comando);
+    }
+
+    public async Task<bool> BaixarEstoqueSeDisponivelAsync(int id, int quantidade)
+    {
+        const string sql = """
+            UPDATE tb_jogo
+            SET qt_estoque = qt_estoque - @quantidade
+            WHERE co_seq_jogo = @id AND st_ativo = TRUE AND qt_estoque >= @quantidade;
+            """;
+        await using var conexao = await AbrirConexaoAsync();
+        await using var comando = CriarComando(conexao, sql);
+        AdicionarParametro(comando, "@id", id);
+        AdicionarParametro(comando, "@quantidade", quantidade);
+        return await ExecutarGravacaoAsync(comando) == 1;
+    }
+
+    public async Task<bool> ReporEstoqueAsync(int id, int quantidade)
+    {
+        const string sql = """
+            UPDATE tb_jogo
+            SET qt_estoque = qt_estoque + @quantidade
+            WHERE co_seq_jogo = @id;
+            """;
+        await using var conexao = await AbrirConexaoAsync();
+        await using var comando = CriarComando(conexao, sql);
+        AdicionarParametro(comando, "@id", id);
+        AdicionarParametro(comando, "@quantidade", quantidade);
+        return await ExecutarGravacaoAsync(comando) == 1;
     }
 
     private static void AdicionarParametrosFiltros(
@@ -200,6 +229,7 @@ public sealed class JogoRepository : RepositoryBase, IJogoRepository
     {
         AdicionarParametro(comando, "@nome", jogo.Nome);
         AdicionarParametro(comando, "@descricao", jogo.Descricao);
+        AdicionarParametro(comando, "@imagem", jogo.Imagem);
         AdicionarParametro(comando, "@anoLancamento", jogo.AnoLancamento);
         AdicionarParametro(comando, "@preco", jogo.Preco);
         AdicionarParametro(comando, "@estoque", jogo.Estoque);
@@ -218,6 +248,9 @@ public sealed class JogoRepository : RepositoryBase, IJogoRepository
             Descricao = leitor.IsDBNull(leitor.GetOrdinal("ds_jogo"))
                 ? null
                 : leitor.GetString("ds_jogo"),
+            Imagem = leitor.IsDBNull(leitor.GetOrdinal("ds_imagem"))
+                ? null
+                : leitor.GetString("ds_imagem"),
             AnoLancamento = leitor.GetInt32("nu_ano_lancamento"),
             Preco = leitor.GetDecimal("vl_preco"),
             Estoque = leitor.GetInt32("qt_estoque"),

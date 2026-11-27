@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { jogoApi } from '../api/servicos'
+import { jogoApi, mensagemContatoApi } from '../api/servicos'
+import { obterErrosDosCampos, obterMensagemErro } from '../api/erros'
 import fundoHero from '../assets/arcade/background-hero-inicio.png'
 import { IconeCarrinho } from '../components/IconesNavbar'
+import { useAutenticacao } from '../contexts/AutenticacaoContext'
 import { formatarPreco } from '../lib/formato'
 
 const TAMANHO_LOTE = 50
@@ -236,6 +238,8 @@ function normalizarNome(valor) {
 }
 
 function obterCapa(jogo) {
+  if (jogo.imagem) return jogo.imagem
+
   const capasExatas = {
     [normalizarNome('Super Mario Bros.')]: 'Super_Mario_Bros._box_nintendo.png',
     [normalizarNome('Tekken 3')]: 'Tekken_3_capa_playstation.png',
@@ -355,13 +359,35 @@ function resetarInclinacaoBeneficio(event) {
 }
 
 export function Inicio() {
+  const { usuario, estaAutenticado } = useAutenticacao()
   const [destaques, setDestaques] = useState(DESTAQUES_LOCAIS)
   const [novidades, setNovidades] = useState(NOVIDADES_LOCAIS)
   const [tesouros, setTesouros] = useState(TESOUROS_LOCAIS)
   const [jogoEmDestaque, setJogoEmDestaque] = useState(JOGO_EM_DESTAQUE_LOCAL)
   const [rolando, setRolando] = useState(window.scrollY > 24)
   const [perguntasAbertas, setPerguntasAbertas] = useState({})
+  const [mensagemContato, setMensagemContato] = useState('')
+  const [enviandoMensagem, setEnviandoMensagem] = useState(false)
+  const [erroMensagem, setErroMensagem] = useState('')
+  const [sucessoMensagem, setSucessoMensagem] = useState('')
   const capaDoJogoEmDestaque = obterCapa(jogoEmDestaque)
+
+  async function enviarMensagemContato(evento) {
+    evento.preventDefault()
+    setErroMensagem('')
+    setSucessoMensagem('')
+    setEnviandoMensagem(true)
+    try {
+      await mensagemContatoApi.enviar({ mensagem: mensagemContato })
+      setMensagemContato('')
+      setSucessoMensagem('Mensagem recebida! Nossa equipe responderá pelo e-mail da sua conta.')
+    } catch (error) {
+      const erros = obterErrosDosCampos(error)
+      setErroMensagem(erros.mensagem?.[0] ?? obterMensagemErro(error))
+    } finally {
+      setEnviandoMensagem(false)
+    }
+  }
 
   useEffect(() => {
     function acompanharRolagem() {
@@ -668,23 +694,23 @@ export function Inicio() {
             <p className="rg-inicio-faq-formulario-intro">
               Ficou com alguma dúvida? Mande uma mensagem para a equipe RetroGames.
             </p>
-            <form action="mailto:atendimento@retrogames.local?subject=Contato%20pelo%20site" method="post" encType="text/plain">
-              <div className="rg-inicio-faq-formulario-campos">
-                <label>
-                  <span>Seu nome</span>
-                  <input type="text" name="Nome" placeholder="Como podemos chamar você?" autoComplete="name" required />
+            {estaAutenticado ? (
+              <form onSubmit={enviarMensagemContato} noValidate>
+                <p className="rg-inicio-faq-remetente">Enviando como <strong>{usuario?.nome} · {usuario?.email}</strong></p>
+                <label className="rg-inicio-faq-formulario-mensagem">
+                  <span>Sua mensagem</span>
+                  <textarea value={mensagemContato} onChange={(evento) => setMensagemContato(evento.target.value)} rows="4" placeholder="Escreva sua dúvida ou mensagem..." required />
                 </label>
-                <label>
-                  <span>Seu e-mail</span>
-                  <input type="email" name="E-mail" placeholder="voce@exemplo.com" autoComplete="email" required />
-                </label>
+                {erroMensagem && <p className="rg-form-alerta" role="alert">{erroMensagem}</p>}
+                {sucessoMensagem && <p className="rg-form-sucesso" role="status">{sucessoMensagem}</p>}
+                <button type="submit" className="rg-inicio-faq-enviar" disabled={enviandoMensagem}>{enviandoMensagem ? 'Enviando...' : 'Enviar mensagem'}</button>
+              </form>
+            ) : (
+              <div className="rg-inicio-faq-login">
+                <p>Faça login para enviar uma mensagem para nossa equipe.</p>
+                <Link className="rg-inicio-faq-enviar" to="/login?voltarPara=%2Finicio">Fazer login</Link>
               </div>
-              <label className="rg-inicio-faq-formulario-mensagem">
-                <span>Sua mensagem</span>
-                <textarea name="Mensagem" rows="4" placeholder="Escreva sua dúvida ou mensagem..." required />
-              </label>
-              <button type="submit" className="rg-inicio-faq-enviar">Enviar mensagem</button>
-            </form>
+            )}
           </div>
           <FaixaPixelsFaq posicao="base" />
         </div>

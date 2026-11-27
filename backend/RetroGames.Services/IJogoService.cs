@@ -19,4 +19,6 @@ public interface IJogoService
     Task AlterarAsync(Jogo jogo, IReadOnlyCollection<int> idsGeneros);
 
     Task DesativarAsync(int id);
+
+    Task AtivarAsync(int id);
 }
