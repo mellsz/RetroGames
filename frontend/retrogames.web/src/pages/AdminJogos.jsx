@@ -69,6 +69,31 @@ function SeletorFiltroAdmin({ label, value, options, onChange }) {
   )
 }
 
+function SeletorCampoFormulario({ id, label, value, options, onChange, erroCampo }) {
+  const selecionada = options.find((opcao) => opcao.value === value) ?? options[0]
+
+  function selecionar(evento, proximoValor) {
+    evento.currentTarget.closest('details')?.removeAttribute('open')
+    onChange(proximoValor)
+  }
+
+  return (
+    <div className="rg-admin-jogo-form-field rg-admin-jogo-form-seletor">
+      <label htmlFor={id}>{label} <em>*</em></label>
+      <details className="rg-seletor-personalizado">
+        <summary id={id} aria-label={`Selecionar ${label.toLowerCase()}`}>
+          <span>{selecionada.label}</span>
+          <span className="rg-seletor-seta" aria-hidden="true" />
+        </summary>
+        <div className="rg-seletor-opcoes" role="listbox" aria-label={label}>
+          {options.map((opcao) => <button key={opcao.value || 'vazio'} type="button" role="option" aria-selected={opcao.value === value} onClick={(evento) => selecionar(evento, opcao.value)}>{opcao.label}</button>)}
+        </div>
+      </details>
+      {erroCampo?.[0] && <small className="rg-form-erro">{erroCampo[0]}</small>}
+    </div>
+  )
+}
+
 export function AdminJogos() {
   const TAMANHO_PAGINA = 5
   const [resultado, setResultado] = useState({ itens: [] })
@@ -215,6 +240,8 @@ export function FormularioJogo() {
   const [erro, setErro] = useState('')
   const [errosCampos, setErrosCampos] = useState({})
   const [arquivoImagem, setArquivoImagem] = useState(null)
+  const [imagemPreview, setImagemPreview] = useState('')
+  const formularioRef = useRef(null)
 
   useEffect(() => {
     let ativo = true
@@ -232,6 +259,9 @@ export function FormularioJogo() {
             nome: jogo.nome, descricao: jogo.descricao ?? '', anoLancamento: String(jogo.anoLancamento), preco: String(jogo.preco), estoque: String(jogo.estoque),
             idPlataforma: String(jogo.idPlataforma), idCondicaoJogo: String(jogo.idCondicaoJogo), idsGeneros: jogo.generos.map((genero) => genero.id), ativo: jogo.ativo,
           })
+          setImagemPreview(jogo.imagem || obterCapaAdmin(jogo) || '')
+        } else {
+          setImagemPreview('')
         }
       } catch (error) {
         if (ativo) setErro(obterMensagemErro(error))
@@ -243,6 +273,28 @@ export function FormularioJogo() {
     return () => { ativo = false }
   }, [id, editando])
 
+  useEffect(() => () => {
+    if (imagemPreview.startsWith('blob:')) URL.revokeObjectURL(imagemPreview)
+  }, [imagemPreview])
+
+  useEffect(() => {
+    function fecharSeletores(evento) {
+      if (!formularioRef.current?.contains(evento.target)) return
+      if (!evento.target.closest('details')) formularioRef.current.querySelectorAll('details[open]').forEach((seletor) => seletor.removeAttribute('open'))
+    }
+
+    function fecharComEsc(evento) {
+      if (evento.key === 'Escape') formularioRef.current?.querySelectorAll('details[open]').forEach((seletor) => seletor.removeAttribute('open'))
+    }
+
+    document.addEventListener('pointerdown', fecharSeletores)
+    document.addEventListener('keydown', fecharComEsc)
+    return () => {
+      document.removeEventListener('pointerdown', fecharSeletores)
+      document.removeEventListener('keydown', fecharComEsc)
+    }
+  }, [])
+
   function atualizarCampo(evento) {
     const { name, value, type, checked } = evento.target
     setFormulario((atual) => ({ ...atual, [name]: type === 'checkbox' ? checked : value }))
@@ -253,6 +305,12 @@ export function FormularioJogo() {
       ...atual,
       idsGeneros: atual.idsGeneros.includes(idGenero) ? atual.idsGeneros.filter((idAtual) => idAtual !== idGenero) : [...atual.idsGeneros, idGenero],
     }))
+  }
+
+  function selecionarImagem(evento) {
+    const arquivo = evento.target.files?.[0] ?? null
+    setArquivoImagem(arquivo)
+    setImagemPreview(arquivo ? URL.createObjectURL(arquivo) : '')
   }
 
   async function enviar(evento) {
@@ -285,23 +343,72 @@ export function FormularioJogo() {
 
   if (carregando) return <p className="rg-autenticacao-verificando">Carregando formulário...</p>
 
+  const generosSelecionados = generos.filter((genero) => formulario.idsGeneros.includes(genero.id))
+
   return (
-    <section className="rg-admin-pagina rg-pagina-enter">
-      <Link className="rg-admin-voltar" to="/admin/jogos">← Voltar para jogos</Link>
-      <p className="rg-admin-etiqueta">Administração · Jogos</p>
-      <h1>{editando ? 'Editar jogo' : 'Novo jogo'}</h1>
+    <section className="rg-admin-jogo-form-page rg-pagina-enter">
+      <nav className="rg-admin-jogos-breadcrumb" aria-label="Caminho de navegação">
+        <Link className="rg-admin-jogos-casa" to="/admin" aria-label="Voltar ao painel administrativo"><img src={iconeCasa} alt="" aria-hidden="true" /></Link>
+        <Link className="rg-admin-jogos-breadcrumb-link" to="/admin">Administração</Link>
+        <b aria-hidden="true">›</b>
+        <Link className="rg-admin-jogos-breadcrumb-link" to="/admin/jogos">Jogos</Link>
+        <b aria-hidden="true">›</b>
+        <strong>{editando ? 'Editar' : 'Novo jogo'}</strong>
+      </nav>
+      <header className="rg-admin-jogo-form-cabecalho">
+        <h1>{editando ? 'Editar jogo' : 'Novo jogo'}</h1>
+        <p>{editando ? 'Atualize as informações do jogo no catálogo.' : 'Cadastre um novo jogo no catálogo.'}</p>
+      </header>
       {erro && <p className="rg-form-alerta" role="alert">{erro}</p>}
-      <form className="rg-admin-formulario rg-admin-formulario--jogo" onSubmit={enviar} noValidate>
-        <label>Nome<input name="nome" value={formulario.nome} onChange={atualizarCampo} /></label><ErroCampo erros={errosCampos} nome="nome" />
-        <label>Descrição<textarea name="descricao" rows="4" value={formulario.descricao} onChange={atualizarCampo} /></label><ErroCampo erros={errosCampos} nome="descricao" />
-        <label>Capa do jogo<input name="imagem" type="file" accept="image/png,image/jpeg,image/webp" onChange={(evento) => setArquivoImagem(evento.target.files?.[0] ?? null)} /></label>
-        {editando && !arquivoImagem && <p className="rg-admin-ajuda">Envie outra imagem somente se quiser substituir a capa atual.</p>}
-        <div className="rg-admin-formulario-linha"><label>Ano<input name="anoLancamento" type="number" value={formulario.anoLancamento} onChange={atualizarCampo} /></label><label>Preço<input name="preco" type="number" step="0.01" min="0" value={formulario.preco} onChange={atualizarCampo} /></label><label>Estoque<input name="estoque" type="number" min="0" value={formulario.estoque} onChange={atualizarCampo} /></label></div>
-        <div className="rg-admin-formulario-linha"><label>Plataforma<select name="idPlataforma" value={formulario.idPlataforma} onChange={atualizarCampo}><option value="">Selecione</option>{plataformas.map((plataforma) => <option key={plataforma.id} value={plataforma.id}>{plataforma.nome}</option>)}</select></label><label>Condição<select name="idCondicaoJogo" value={formulario.idCondicaoJogo} onChange={atualizarCampo}><option value="">Selecione</option>{condicoes.map((condicao) => <option key={condicao.id} value={condicao.id}>{condicao.descricao}</option>)}</select></label></div>
-        <ErroCampo erros={errosCampos} nome="idPlataforma" /><ErroCampo erros={errosCampos} nome="idCondicaoJogo" />
-        <fieldset><legend>Gêneros</legend><div className="rg-admin-generos">{generos.map((genero) => <label key={genero.id}><input type="checkbox" checked={formulario.idsGeneros.includes(genero.id)} onChange={() => alternarGenero(genero.id)} /> {genero.nome}</label>)}</div></fieldset><ErroCampo erros={errosCampos} nome="idsGeneros" />
-        {editando && <label className="rg-admin-checkbox"><input type="checkbox" name="ativo" checked={formulario.ativo} onChange={atualizarCampo} /> Jogo ativo no catálogo</label>}
-        <div className="rg-admin-botoes"><button className="rg-btn-primary" disabled={enviando}>{enviando ? 'Salvando...' : 'Salvar jogo'}</button><button type="button" className="rg-btn-secondary" onClick={() => navegar('/admin/jogos')}>Cancelar</button></div>
+      <form className="rg-admin-jogo-form-card" ref={formularioRef} onSubmit={enviar} noValidate>
+        <div className="rg-admin-jogo-form-grid">
+          <div className="rg-admin-jogo-form-campos">
+            <div className="rg-admin-jogo-form-field rg-admin-jogo-form-field--full">
+              <label htmlFor="jogo-nome">Nome do jogo <em>*</em></label>
+              <input id="jogo-nome" name="nome" value={formulario.nome} onChange={atualizarCampo} />
+              <ErroCampo erros={errosCampos} nome="nome" />
+            </div>
+            <div className="rg-admin-jogo-form-field rg-admin-jogo-form-field--full">
+              <label htmlFor="jogo-descricao">Descrição <em>*</em></label>
+              <textarea id="jogo-descricao" name="descricao" rows="4" value={formulario.descricao} onChange={atualizarCampo} />
+              <ErroCampo erros={errosCampos} nome="descricao" />
+            </div>
+            <div className="rg-admin-jogo-form-field">
+              <label htmlFor="jogo-preco">Preço (R$) <em>*</em></label>
+              <input id="jogo-preco" name="preco" type="number" step="0.01" min="0" value={formulario.preco} onChange={atualizarCampo} />
+              <ErroCampo erros={errosCampos} nome="preco" />
+            </div>
+            <div className="rg-admin-jogo-form-field">
+              <label htmlFor="jogo-ano">Ano <em>*</em></label>
+              <input id="jogo-ano" name="anoLancamento" type="number" value={formulario.anoLancamento} onChange={atualizarCampo} />
+              <ErroCampo erros={errosCampos} nome="anoLancamento" />
+            </div>
+            <div className="rg-admin-jogo-form-field">
+              <label htmlFor="jogo-estoque">Estoque <em>*</em></label>
+              <input id="jogo-estoque" name="estoque" type="number" min="0" value={formulario.estoque} onChange={atualizarCampo} />
+              <ErroCampo erros={errosCampos} nome="estoque" />
+            </div>
+            <SeletorCampoFormulario id="jogo-plataforma" label="Plataforma" value={formulario.idPlataforma} options={[{ value: '', label: 'Selecione' }, ...plataformas.map((plataforma) => ({ value: String(plataforma.id), label: plataforma.nome }))]} onChange={(valor) => setFormulario((atual) => ({ ...atual, idPlataforma: valor }))} erroCampo={errosCampos.idPlataforma} />
+            <SeletorCampoFormulario id="jogo-condicao" label="Condição" value={formulario.idCondicaoJogo} options={[{ value: '', label: 'Selecione' }, ...condicoes.map((condicao) => ({ value: String(condicao.id), label: condicao.descricao }))]} onChange={(valor) => setFormulario((atual) => ({ ...atual, idCondicaoJogo: valor }))} erroCampo={errosCampos.idCondicaoJogo} />
+            <SeletorCampoFormulario id="jogo-status" label="Status" value={formulario.ativo ? 'true' : 'false'} options={[{ value: 'true', label: 'Ativo' }, { value: 'false', label: 'Inativo' }]} onChange={(valor) => setFormulario((atual) => ({ ...atual, ativo: valor === 'true' }))} />
+            <div className="rg-admin-jogo-form-field rg-admin-jogo-form-field--full">
+              <label>Gêneros <em>*</em></label>
+              <details className="rg-admin-generos-seletor">
+                <summary><span className="rg-admin-generos-selecionados">{generosSelecionados.length > 0 ? generosSelecionados.map((genero) => <span className="rg-admin-genero-chip" key={genero.id}>{genero.nome}<button type="button" aria-label={`Remover gênero ${genero.nome}`} onClick={(evento) => { evento.preventDefault(); alternarGenero(genero.id) }}>×</button></span>) : <span className="rg-admin-generos-placeholder">Selecione os gêneros</span>}</span><span className="rg-seletor-seta" aria-hidden="true" /></summary>
+                <div className="rg-admin-generos-opcoes">{generos.map((genero) => <label key={genero.id}><input type="checkbox" checked={formulario.idsGeneros.includes(genero.id)} onChange={() => alternarGenero(genero.id)} />{genero.nome}</label>)}</div>
+              </details>
+              <ErroCampo erros={errosCampos} nome="idsGeneros" />
+            </div>
+          </div>
+          <aside className="rg-admin-jogo-capa">
+            <h2>Capa do jogo</h2>
+            <p>Envie uma imagem da capa ou arte do jogo.</p>
+            <div className="rg-admin-jogo-capa-preview">{imagemPreview ? <img src={imagemPreview} alt={`Capa de ${formulario.nome || 'novo jogo'}`} /> : <span>Sem capa selecionada</span>}</div>
+            <label className="rg-admin-jogo-upload"><span aria-hidden="true">⇧</span>{arquivoImagem ? 'Alterar imagem' : 'Alterar imagem'}<input name="imagem" type="file" accept="image/png,image/jpeg,image/webp" onChange={selecionarImagem} /></label>
+            <small>Formatos: JPG, PNG ou WEBP&nbsp; · &nbsp;Máx. 5 MB</small>
+          </aside>
+        </div>
+        <div className="rg-admin-jogo-form-acoes"><button type="button" className="rg-btn-secondary" onClick={() => navegar('/admin/jogos')}>Cancelar</button><button className="rg-admin-jogo-salvar" disabled={enviando}>{enviando ? 'Salvando...' : editando ? 'Salvar alterações' : 'Salvar jogo'}</button></div>
       </form>
     </section>
   )

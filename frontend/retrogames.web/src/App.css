@@ -3726,6 +3726,53 @@
 .rg-admin-jogos-paginacao button:disabled { opacity: .4; }
 .rg-admin-jogos-estado { margin: 2rem 0; color: var(--rg-text-secondary); }
 
+/* ===== Formulário administrativo de jogos ===== */
+.rg-admin-jogo-form-page { width: min(100% - 1rem, 100rem); margin: 0 auto; padding: clamp(2rem, 5vw, 4rem) 0 4rem; }
+.rg-admin-jogo-form-cabecalho { margin-bottom: 1.8rem; }
+.rg-admin-jogo-form-cabecalho h1 { display: flex; align-items: center; gap: .65rem; margin: 0; color: var(--rg-text-primary); font-size: clamp(2.1rem, 3.2vw, 3rem); font-weight: 800; letter-spacing: -.04em; line-height: .98; }
+.rg-admin-jogo-form-cabecalho h1::before { content: ''; display: block; width: .3rem; height: 2.25rem; flex: 0 0 .3rem; border-radius: 3px; background: var(--rg-purple-bright); box-shadow: 0 0 14px rgba(157, 36, 255, .45); }
+.rg-admin-jogo-form-cabecalho p { margin: .55rem 0 0 .95rem; color: var(--rg-text-secondary); font-size: 1rem; }
+.rg-admin-jogo-form-card { border: 1px solid rgba(157, 36, 255, .58); border-radius: 9px; background: rgba(15, 14, 29, .74); padding: 1.45rem 1.5rem 1.25rem; }
+.rg-admin-jogo-form-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(19rem, .9fr); gap: 1.7rem; }
+.rg-admin-jogo-form-campos { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); align-content: start; gap: .9rem 1.2rem; padding-right: 1.7rem; border-right: 1px solid rgba(167, 139, 250, .22); }
+.rg-admin-jogo-form-field { min-width: 0; grid-column: span 2; }
+.rg-admin-jogo-form-field--full { grid-column: 1 / -1; }
+.rg-admin-jogo-form-field > label, .rg-admin-jogo-capa h2 { display: block; margin: 0 0 .4rem; color: var(--rg-text-primary); font-size: .83rem; font-weight: 700; }
+.rg-admin-jogo-form-field > label em { color: #ff76b6; font-style: normal; }
+.rg-admin-jogo-form-field input, .rg-admin-jogo-form-field textarea, .rg-admin-jogo-form-field select { width: 100%; min-height: 2.45rem; border: 1px solid rgba(157, 36, 255, .64); border-radius: 7px; background: rgba(5, 4, 15, .76); color: var(--rg-text-primary); padding: .62rem .75rem; outline: none; }
+.rg-admin-jogo-form-field textarea { min-height: 6rem; resize: vertical; line-height: 1.4; }
+.rg-admin-jogo-form-field input:focus, .rg-admin-jogo-form-field textarea:focus, .rg-admin-jogo-form-field select:focus { border-color: var(--rg-purple-bright); box-shadow: 0 0 0 3px rgba(157, 36, 255, .14); }
+.rg-admin-jogo-form-field select { appearance: auto; }
+.rg-admin-generos-seletor { position: relative; z-index: 2; }
+.rg-admin-generos-seletor[open] { z-index: 8; }
+.rg-admin-generos-seletor summary { display: flex; min-height: 2.45rem; align-items: center; justify-content: space-between; gap: .75rem; border: 1px solid rgba(157, 36, 255, .64); border-radius: 7px; background: rgba(5, 4, 15, .76); color: var(--rg-text-primary); padding: .38rem .7rem; cursor: pointer; list-style: none; }
+.rg-admin-generos-seletor summary::-webkit-details-marker { display: none; }
+.rg-admin-generos-seletor[open] summary, .rg-admin-generos-seletor summary:hover { border-color: var(--rg-purple-bright); box-shadow: 0 0 0 3px rgba(157, 36, 255, .12); }
+.rg-admin-generos-selecionados { display: flex; flex-wrap: wrap; gap: .35rem; min-width: 0; }
+.rg-admin-generos-placeholder { color: var(--rg-text-muted); font-size: .86rem; }
+.rg-admin-genero-chip { display: inline-flex; align-items: center; gap: .35rem; border-radius: 999px; background: rgba(109, 40, 217, .42); color: var(--rg-text-primary); padding: .25rem .48rem .25rem .62rem; font-size: .76rem; }
+.rg-admin-genero-chip button { border: 0; background: transparent; color: #d8c8ff; padding: 0; font-size: .95rem; line-height: .8; cursor: pointer; }
+.rg-admin-generos-opcoes { position: absolute; top: calc(100% + .4rem); right: 0; left: 0; display: grid; gap: .2rem; max-height: 12rem; overflow-y: auto; border: 1px solid rgba(139, 92, 246, .48); border-radius: 9px; background: #100a27; box-shadow: 0 14px 30px rgba(4, 2, 15, .72); padding: .45rem; }
+.rg-admin-generos-opcoes label { display: flex; align-items: center; gap: .5rem; border-radius: 6px; color: #d8d0ef; padding: .58rem .65rem; font-size: .84rem; cursor: pointer; }
+.rg-admin-generos-opcoes label:hover { background: rgba(109, 40, 217, .32); color: var(--rg-text-primary); }
+.rg-admin-generos-opcoes input { width: auto !important; min-height: 0 !important; accent-color: var(--rg-purple-bright); }
+.rg-admin-jogo-capa { min-width: 0; padding-left: .25rem; }
+.rg-admin-jogo-capa h2 { margin-bottom: .45rem; font-size: .95rem; }
+.rg-admin-jogo-capa > p { margin: 0 0 1.05rem; color: var(--rg-text-secondary); font-size: .82rem; }
+.rg-admin-jogo-capa-preview { display: grid; width: min(100%, 18rem); height: 15rem; margin: 0 auto 1rem; place-items: center; overflow: hidden; border: 1px solid rgba(167, 75, 255, .55); border-radius: 8px; background: radial-gradient(circle at 50% 35%, rgba(109, 40, 217, .24), rgba(5, 4, 15, .82) 72%); color: var(--rg-text-muted); text-align: center; }
+.rg-admin-jogo-capa-preview img { width: 100%; height: 100%; object-fit: contain; image-rendering: auto; }
+.rg-admin-jogo-upload { display: flex; width: fit-content; min-height: 2.3rem; align-items: center; gap: .45rem; margin: 0 auto .55rem; border: 1px solid rgba(167, 139, 250, .72); border-radius: 999px; background: rgba(109, 40, 217, .14); color: var(--rg-text-primary); padding: .5rem 1rem; font-size: .8rem; font-weight: 700; cursor: pointer; transition: border-color .18s ease, background-color .18s ease, transform .18s ease; }
+.rg-admin-jogo-upload:hover { border-color: var(--rg-purple-bright); background: rgba(109, 40, 217, .3); transform: translateY(-1px); }
+.rg-admin-jogo-upload span { color: var(--rg-violet); font-size: 1.1rem; line-height: .8; }
+.rg-admin-jogo-upload input { display: none; }
+.rg-admin-jogo-capa > small { display: block; color: var(--rg-text-muted); font-size: .7rem; text-align: center; }
+.rg-admin-jogo-form-acoes { display: flex; justify-content: flex-end; gap: .85rem; margin-top: 1.4rem; padding-top: 1rem; border-top: 1px solid rgba(167, 139, 250, .18); }
+.rg-admin-jogo-form-acoes .rg-btn-secondary, .rg-admin-jogo-salvar { min-height: 2.45rem; border-radius: 7px; padding: .6rem 1.35rem; font-size: .82rem; font-weight: 750; }
+.rg-admin-jogo-form-acoes .rg-btn-secondary { border-color: rgba(167, 139, 250, .8); }
+.rg-admin-jogo-salvar { border: 1px solid rgba(194, 83, 255, .85); background: linear-gradient(135deg, #8b2ff0, #6d28d9); color: #fff; box-shadow: 0 5px 16px rgba(109, 40, 217, .22); transition: filter .18s ease, transform .18s ease; }
+.rg-admin-jogo-salvar:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-1px); }
+.rg-admin-jogo-salvar:disabled { cursor: wait; opacity: .68; }
+
 @media (max-width: 767.98px) {
   .rg-autenticacao { min-height: 37rem; padding: 3rem 0.8rem; }.rg-autenticacao-cartao { padding: 1.5rem 1.1rem; }
   .rg-admin-atalhos, .rg-admin-grade { grid-template-columns: 1fr; }.rg-admin-formulario-linha { flex-direction: column; gap: 0; }.rg-admin-cabecalho-lista { align-items: flex-end; }.rg-admin-pagina th, .rg-admin-pagina td { white-space: nowrap; }.rg-admin-busca { align-items: stretch; flex-direction: column; }
@@ -3827,6 +3874,13 @@
 
 @media (max-width: 720px) {
   .rg-admin-jogos { width: min(100% - 1.2rem, 42rem); padding-top: 2rem; }
+  .rg-admin-jogo-form-page { width: min(100% - 1.2rem, 42rem); padding-top: 2rem; }
+  .rg-admin-jogo-form-grid { grid-template-columns: 1fr; }
+  .rg-admin-jogo-form-campos { grid-template-columns: 1fr; padding-right: 0; border-right: 0; }
+  .rg-admin-jogo-form-field, .rg-admin-jogo-form-field--full { grid-column: 1; }
+  .rg-admin-jogo-capa { padding: 1.3rem 0 0; border-top: 1px solid rgba(167, 139, 250, .22); }
+  .rg-admin-jogo-form-acoes { justify-content: stretch; }
+  .rg-admin-jogo-form-acoes > * { flex: 1; }
   .rg-admin-jogos-cabecalho { align-items: flex-start; flex-direction: column; }
   .rg-admin-jogos-adicionar { align-self: stretch; justify-content: center; }
   .rg-admin-jogos-filtros { grid-template-columns: 1fr; gap: .75rem; }
